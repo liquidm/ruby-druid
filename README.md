@@ -1,7 +1,8 @@
 Early stages of ruby support library for metamx druid
 
 What we got so far:
-`
+
+```ruby
 require "./druid"
 
 puts Druid::Query.new(:source).group(:group1, :group2).
@@ -9,11 +10,10 @@ puts Druid::Query.new(:source).group(:group1, :group2).
   interval("2013-01-26T00", "2020-01-26T00:15").
   granularity(:day).filter{foo.in(1, 2) & bar.eq(3)}.
   to_json
-
-`
+```
 
 Outputs:
-`
+```json
 {
   "dataSource": "source",
   "queryType": "groupBy",
@@ -49,4 +49,4 @@ Outputs:
     }]
   }
 }
-`
+```
