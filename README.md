@@ -1,3 +1,6 @@
-Collection of ruby-based tools and libraries for metamx druid
+ruby-druid
+==========
 
-Work in progress!
+Collection of ruby-based tools and libraries for [metamx druid](https://github.com/metamx/druid)
+
+> Work in progress!
