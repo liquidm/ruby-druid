@@ -10,7 +10,7 @@ module Druid
     end
 
     def data_sources
-      @zk.data_sources
+      @zk.data_sources.keys
     end
 
     def query(id, &block)
