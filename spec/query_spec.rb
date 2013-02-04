@@ -1,6 +1,6 @@
 $:.push File.expand_path("../../lib", __FILE__)
 
-require 'druid'
+require 'query'
 
 describe Druid::Query do
 

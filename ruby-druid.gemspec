@@ -6,6 +6,6 @@ Gem::Specification.new do |s|
   s.description = "Collection of ruby-based tools and libraries for metamx druid"
   s.authors     = ['Hagen Rother', 'Holger Pillmann']
   s.email       = 'tech@madvertise.de'
-  s.files       = ['lib/druid.rb', 'lib/zkhandler.rb']
+  s.files       = ['lib/query.rb', 'lib/zkhandler.rb']
   s.homepage    = 'http://www.madvertise.de'
 end
