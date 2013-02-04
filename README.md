@@ -6,7 +6,7 @@ What we got so far:
 require "./druid"
 
 client = Druid::Client.new 'zookeeper.local:2181/druid'
-resp = client.query('service/datasource') do
+resp = client.query('service/source') do
   group(:group1, :group2)
   long_sum(:sum1, :sum2)
   interval("2013-01-26T00", "2020-01-26T00:15")
@@ -15,7 +15,7 @@ resp = client.query('service/datasource') do
 end
 ```
 
-Will look up the datasource 'datasource' in serivce 'service' and post the following:
+Will look up the datasource 'source' in serivce 'service' and post the following:
 
 ```json
 {
