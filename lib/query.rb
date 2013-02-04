@@ -227,7 +227,6 @@ module Druid
       to_hash
     end
 
-
     def to_hash
       result = {
         :type => @name
