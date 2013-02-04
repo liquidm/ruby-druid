@@ -86,6 +86,12 @@ describe Druid::Query do
     JSON.parse(@query.to_json)['filter'].should == {"type"=>"selector", "dimension"=>"a", "value"=>1}
   end
 
+  it 'creates an equals filter with ==' do
+    @query.filter{a == 1}
+    JSON.parse(@query.to_json)['filter'].should == {"type"=>"selector", "dimension"=>"a", "value"=>1}
+  end
+
+
   it 'creates a not filter' do
     @query.filter{!a.eq 1}
     JSON.parse(@query.to_json)['filter'].should ==  {"field" =>
@@ -99,6 +105,14 @@ describe Druid::Query do
       {"type"=>"selector", "dimension"=>"a", "value"=>1},
     "type" => "not"}
   end
+
+  it 'creates a not filter with !=' do
+    @query.filter{a != 1}
+    JSON.parse(@query.to_json)['filter'].should ==  {"field" =>
+      {"type"=>"selector", "dimension"=>"a", "value"=>1},
+    "type" => "not"}
+  end
+
 
   it 'creates an and filter' do
     @query.filter{a.neq(1) & b.eq(2) & c.eq('foo')}

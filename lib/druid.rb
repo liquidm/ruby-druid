@@ -111,9 +111,14 @@ module Druid
       self
     end
 
+    alias :'==' :eq
+
+
     def neq(value)
       return !self.in(value)
     end
+
+    alias :'!=' :neq
 
     def in(*args)
       values = args.flatten
