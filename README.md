@@ -5,14 +5,18 @@ What we got so far:
 ```ruby
 require "./druid"
 
-puts Druid::Query.new(:source).group(:group1, :group2).
-  long_sum(:sum1, :sum2).
-  interval("2013-01-26T00", "2020-01-26T00:15").
-  granularity(:day).filter{foo.in(1, 2) & bar.eq(3)}.
-  to_json
+client = Druid::Client.new 'zookeeper.local:2181/druid'
+resp = client.query('service/datasource') do
+  group(:group1, :group2)
+  long_sum(:sum1, :sum2)
+  interval("2013-01-26T00", "2020-01-26T00:15")
+  granularity(:day)
+  filter{foo.in(1, 2) & bar.eq(3)}
+end
 ```
 
-Outputs:
+Will look up the datasource 'datasource' in serivce 'service' and post the following:
+
 ```json
 {
   "dataSource": "source",
@@ -50,3 +54,5 @@ Outputs:
   }
 }
 ```
+
+The response (unless an exception was raised) is already `JSON.parse`d
