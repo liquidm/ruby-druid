@@ -14,27 +14,38 @@ module ZK
       uri.should == 'test-uri'
       opts.should == { :chroot => :check }
       @registrations = {}
+      @paths = {
+        '/disco' => ['a', 'b'],
+        '/disco/a' => ['b1', 'm1'],
+        '/disco/b' => ['b2', 'm2']
+      }
+      @unregisters = []
     end
 
     def register(path, opts, &block)
       opts.should == { :only => :child }
       @registrations[path].should == nil
+
+      zk = self
+      block.define_singleton_method :unregister do
+        zk.instance_variable_get('@unregisters').push path
+        zk.instance_variable_get('@registrations').delete path
+      end
       @registrations[path] = block
+    end
+
+    def unregistrations
+      result = @unregisters
+      @unregisters = []
+      result
     end
 
     def children(path, opts)
       @registrations[path].should be_a(Proc)
 
-      case path
-      when '/disco'
-        ['a', 'b']
-      when '/disco/a'
-        ['b1', 'm1']
-      when '/disco/b'
-        ['b2', 'm2']
-      else
-        throw "no mock code for #{path}"
-      end
+      value = @paths[path]
+      throw "no mock code for #{path}" unless value
+      value
     end
 
     def get(path)
@@ -59,9 +70,19 @@ module ZK
           :address => 'm2_address',
           :port => 85
         }.to_json]
+      when '/disco/a/b3'
+        [{
+          :address => 'b3_address',
+          :port => 83
+        }.to_json]
       else
         throw "no mock code for #{path}"
       end
+    end
+
+    def change(uri, values)
+      @paths[uri] = values
+      @registrations[uri].call if @registrations[uri]
     end
   end
 end
@@ -97,6 +118,8 @@ describe Druid::ZooHandler do
         RestClientResponseMock.new(200, ['s1','s2'].to_json)
       when 'b2'
         RestClientResponseMock.new(200, ['s3','s4'].to_json)
+      when 'b3'
+        RestClientResponseMock.new(200, ['s5','s6'].to_json)
       else
         RestClientResponseMock.new(404, nil)
       end
@@ -110,14 +133,67 @@ describe Druid::ZooHandler do
       ['b2', 90],
       ['m2', 85]
     ]
-
     zk.services.should == ['a', 'b']
-
     zk.data_sources.should == {
       'a/s1' => 'http://b1_address:80/druid/v2/',
       'a/s2' => 'http://b1_address:80/druid/v2/',
       'b/s3' => 'http://b2_address:90/druid/v2/',
       'b/s4' => 'http://b2_address:90/druid/v2/'
     }
+
+    calls = []
+    mock = zk.instance_variable_get('@zk')
+    mock.unregistrations.should == []
+
+    # unregister a whole service
+    mock.change '/disco', ['a']
+    calls.should == []
+    zk.services.should == ['a']
+    zk.data_sources.should == {
+      'a/s1' => 'http://b1_address:80/druid/v2/',
+      'a/s2' => 'http://b1_address:80/druid/v2/'
+    }
+    mock.unregistrations.should == ['/disco/b']
+    # register it again
+    mock.change '/disco', ['a', 'b']
+    calls.should == [
+      ['b2', 90],
+      ['m2', 85]
+    ]
+    zk.services.should == ['a', 'b']
+    zk.data_sources.should == {
+      'a/s1' => 'http://b1_address:80/druid/v2/',
+      'a/s2' => 'http://b1_address:80/druid/v2/',
+      'b/s3' => 'http://b2_address:90/druid/v2/',
+      'b/s4' => 'http://b2_address:90/druid/v2/'
+    }
+    mock.unregistrations.should == []
+
+    #register a new broker
+    calls = []
+    mock.change '/disco/a', ['b1', 'b3']
+    calls.should == [['b3', 83]]
+    zk.services.should == ['a', 'b']
+    zk.data_sources.should == {
+      "a/s1" => "http://b1_address:80/druid/v2/", 
+      "a/s2" => "http://b1_address:80/druid/v2/",
+      "b/s3" => "http://b2_address:90/druid/v2/",
+      "b/s4" => "http://b2_address:90/druid/v2/",
+      "a/s5" => "http://b3_address:83/druid/v2/",
+      "a/s6" => "http://b3_address:83/druid/v2/"
+    }
+    mock.unregistrations.should == ['/disco/a']
+    # unregister it
+    calls = []
+    mock.change '/disco/a', ['b1']
+    calls.should == []
+    zk.services.should == ['a', 'b']
+    zk.data_sources.should == {
+      'a/s1' => 'http://b1_address:80/druid/v2/',
+      'a/s2' => 'http://b1_address:80/druid/v2/',
+      'b/s3' => 'http://b2_address:90/druid/v2/',
+      'b/s4' => 'http://b2_address:90/druid/v2/'
+    }
+    mock.unregistrations.should == ['/disco/a']
   end
 end
