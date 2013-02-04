@@ -61,9 +61,6 @@ module Druid
       self
     end
 
-    def xfilter(hash)
-    end
-
     def interval(from, to)
       from = DateTime.parse(from.to_s) unless from.respond_to? :iso8601
       to = DateTime.parse(to.to_s) unless to.respond_to? :iso8601
