@@ -120,6 +120,25 @@ end
   "type" => "or"}
   end
 
+  it 'chains filters' do
+    @query.filter{a.eq(1)}.filter{b.eq(2)}
+    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
+      {"type"=>"selector", "dimension"=>"a", "value"=>1},
+      {"type"=>"selector", "dimension"=>"b", "value"=>2}
+    ],
+    "type" => "and"}
+  end
+
+  it 'creates filter from hash' do
+    @query.filter a:1, b:2
+    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
+      {"type"=>"selector", "dimension"=>"a", "value"=>1},
+      {"type"=>"selector", "dimension"=>"b", "value"=>2}
+    ],
+    "type" => "and"}
+
+  end
+
   it 'creates an in statement with or filter' do
     @query.filter{a.in [1,2,3]}
     JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [

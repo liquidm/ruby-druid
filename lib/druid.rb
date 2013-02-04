@@ -44,11 +44,24 @@ module Druid
       end
     end
 
-    def filter(&block)
-      filter = Filter.new.instance_exec(&block)
-      raise "Not a valid filter" unless filter.is_a? FilterParameter
-      @properties[:filter] = filter
+    def filter(hash = nil, &block)
+      if hash
+        last = nil
+        hash.each do |k,values|
+          filter = FilterDimension.new(k).in(values)
+          last = last ? last.&(filter) : filter
+        end
+        @properties[:filter] = @properties[:filter] ? @properties[:filter].&(last) : last
+      end
+      if block
+        filter = Filter.new.instance_exec(&block)
+        raise "Not a valid filter" unless filter.is_a? FilterParameter
+        @properties[:filter] = @properties[:filter] ? @properties[:filter].&(filter) : filter
+      end
       self
+    end
+
+    def xfilter(hash)
     end
 
     def interval(from, to)
@@ -115,7 +128,7 @@ module Druid
       end
 
       filter_or = FilterOperator.new('or', true)
-      values.each do |value| 
+      values.each do |value|
         raise "query is too complex" if value.is_a? FilterParameter
         param = FilterDimension.new(@name)
         param.eq value
@@ -212,6 +225,11 @@ module Druid
     def to_s
       to_hash.to_s
     end
+
+    def as_json(options)
+      to_hash
+    end
+
 
     def to_hash
       result = {
