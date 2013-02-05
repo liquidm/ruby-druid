@@ -1,6 +1,6 @@
 $:.push File.expand_path("../../lib", __FILE__)
 
-require 'zkhandler'
+require 'zoo_handler'
 
 module ZK
   def self.new(uri, opts = {})

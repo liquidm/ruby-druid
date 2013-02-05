@@ -1,6 +1,6 @@
-require './lib/zkhandler.rb'
+require './lib/zoo_handler.rb'
 require './lib/query.rb'
-require './lib/responserow.rb'
+require './lib/response_row.rb'
 require 'json'
 require 'rest_client'
 
