@@ -55,8 +55,7 @@ module Druid
         (live - known).each do |name|
           info = @zk.get "#{watchPath}/#{name}"
           node = JSON.parse(info[0])
-          uri =  "http://localhost:8080/druid/v2/"
-          # "http://#{node['address']}:#{node['port']}/druid/v2/"
+          uri =  "http://#{node['address']}:#{node['port']}/druid/v2/"
 
           begin
             check_uri = "#{uri}datasources/"
