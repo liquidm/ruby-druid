@@ -1,6 +1,6 @@
 require './lib/zkhandler.rb'
 require './lib/query.rb'
-require './lib/response.rb'
+require './lib/responserow.rb'
 require 'json'
 require 'rest_client'
 
@@ -35,7 +35,7 @@ module Druid
 
       throw response.to_str if response.code != 200
 
-      JSON.parse(response.to_str).map{ |row| Response.new(row) }
+      JSON.parse(response.to_str).map{ |row| ResponseRow.new(row) }
     end
   end
 end

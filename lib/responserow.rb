@@ -1,6 +1,6 @@
 module Druid
 
-  class Response
+  class ResponseRow
     (instance_methods + private_instance_methods).each do |method|
       unless method.to_s =~ /^(__|object_id|initialize)/
         undef_method method
