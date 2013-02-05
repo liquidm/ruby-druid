@@ -1,5 +1,6 @@
-require './lib/query.rb'
 require './lib/zkhandler.rb'
+require './lib/query.rb'
+require './lib/response.rb'
 require 'json'
 require 'rest_client'
 
@@ -21,11 +22,20 @@ module Druid
       query = Query.new(data_source)
       query.instance_exec(&block)
 
-      response = RestClient.post uri, query.to_json, :content_type => :json, :accept => :json
+      response = RestClient::Request.execute({
+        :method => :post,
+        :url => uri,
+        :timeout => (2 * 60 * 1000),
+        :payload => query.to_json,
+        :headers => {
+          :content_type => :json,
+          :accept => :json
+        }
+      })
 
       throw response.to_str if response.code != 200
 
-      JSON.parse response.to_str
+      JSON.parse(response.to_str).map{ |row| Response.new(row) }
     end
   end
 end
