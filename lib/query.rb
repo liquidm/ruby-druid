@@ -44,6 +44,12 @@ module Druid
       end
     end
 
+    def postagg(&block)
+      post_agg = PostAggregation.new.instance_exec(&block)
+      @properties[:postAggregations] = post_agg
+      self
+    end
+
     def filter(hash = nil, &block)
       if hash
         last = nil
@@ -75,6 +81,71 @@ module Druid
 
     def to_json
       @properties.to_json
+    end
+
+  end
+
+  class PostAggregation
+
+    def initialize
+      @values = []
+    end
+
+    def method_missing(name, *args, &block)
+      PostAggregationField.new(name)     
+    end
+
+    def to_json(*a)
+      @values.to_json
+    end
+  end
+
+  class PostAggregationOperation
+
+    def initialize(left, name, right)
+      @name = name
+      right = PostAggregationConstant.new(1) if right.is_a? Numeric 
+
+      @values = [left, right]
+    end
+
+    def as(output_field)
+      @as = output_field.name
+      self
+    end
+
+    def to_json(*a)
+      [{ "type" => "arithmetic", "fn" => @name, "fields" => @values, "name" => @as}].to_json
+    end
+  end
+
+  class PostAggregationField
+
+    attr_accessor :name
+
+    def initialize(name)
+      @name = name
+    end
+
+    [:+, :-, :/, :*].each do |method_name|
+      define_method method_name do |*params|
+        PostAggregationOperation.new(self, method_name, params[0])
+      end
+    end
+
+    def to_json(*a)
+      {"type" => "fieldAccess", "name" => @name, "fieldName" => @name}.to_json
+    end
+  end
+
+  class PostAggregationConstant < PostAggregationField
+
+    def initialize(name)
+      @name = name
+    end
+
+    def to_json(*a)
+      {'type' => 'constant', 'value' => @name }.to_json
     end
 
   end
@@ -172,6 +243,10 @@ module Druid
       to_hash.to_s
     end
 
+    def as_json
+      to_hash
+    end
+
     def to_json(*a)
       to_hash.to_json(*a)
     end
@@ -222,6 +297,10 @@ module Druid
 
     def to_json(*a)
       to_hash.to_json(*a)
+    end
+
+    def as_json(*a)
+      to_hash
     end
 
     def to_s

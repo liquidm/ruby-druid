@@ -28,6 +28,57 @@ describe Druid::Query do
     JSON.parse(@query.to_json)['dimensions'].should == ['a', 'b', 'c']
   end
 
+  it 'build a post aggregation with a constant right' do
+    @query.postagg{(a + 1).as ctr }
+    
+    JSON.parse(@query.to_json)['postAggregations'].should == [{"type"=>"arithmetic",
+      "fn"=>"+",
+      "fields"=>
+      [{"type"=>"fieldAccess", "name"=>"a", "fieldName"=>"a"},
+       {"type"=>"constant", "value"=>1}],
+      "name"=>"ctr"}]
+  end
+
+  it 'build a + post aggregation' do
+    @query.postagg{(a + b).as ctr }
+    JSON.parse(@query.to_json)['postAggregations'].should == [{"type"=>"arithmetic",
+      "fn"=>"+",
+      "fields"=>
+      [{"type"=>"fieldAccess","name"=>"a", "fieldName"=>"a"},
+      {"type"=>"fieldAccess", "name"=>"b", "fieldName"=>"b"}],
+      "name"=>"ctr"}]
+  end
+
+  it 'build a - post aggregation' do
+    @query.postagg{(a - b).as ctr }
+    JSON.parse(@query.to_json)['postAggregations'].should == [{"type"=>"arithmetic",
+      "fn"=>"-",
+      "fields"=>
+      [{"type"=>"fieldAccess", "name"=>"a", "fieldName"=>"a"},
+      {"type"=>"fieldAccess", "name"=>"b", "fieldName"=>"b"}],
+      "name"=>"ctr"}]
+  end
+
+  it 'build a * post aggregation' do
+    @query.postagg{(a * b).as ctr }
+    JSON.parse(@query.to_json)['postAggregations'].should == [{"type"=>"arithmetic",
+      "fn"=>"*",
+      "fields"=>
+      [{"type"=>"fieldAccess", "name"=>"a", "fieldName"=>"a"},
+      {"type"=>"fieldAccess", "name"=>"b", "fieldName"=>"b"}],
+      "name"=>"ctr"}]
+  end
+
+  it 'build a / post aggregation' do
+    @query.postagg{(a / b).as ctr }
+    JSON.parse(@query.to_json)['postAggregations'].should == [{"type"=>"arithmetic",
+      "fn"=>"/",
+      "fields"=>
+      [{"type"=>"fieldAccess", "name"=>"a", "fieldName"=>"a"},
+      {"type"=>"fieldAccess", "name"=>"b", "fieldName"=>"b"}],
+    "name"=>"ctr"}]
+  end
+
   it 'builds aggregations on long_sum' do
     @query.long_sum(:a, :b, :c)
     JSON.parse(@query.to_json)['aggregations'].should == [
