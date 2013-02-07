@@ -9,13 +9,13 @@
   },
   "granularitySpec": {
     "type":"uniform",
-    "intervals":["<%= start_time.iso8601 %>/<%= end_time.iso8601 %>"],
+    "intervals": <%= intervals.to_json %>,
     "gran":"hour"
   },
   "pathSpec": {
     "type": "static",
-    "paths": "<%= last_time.strftime('/events/%Y/%m/%d/%H') %>h5*,<%= start_time.strftime('/events/%Y/%m/%d/%H') %>*,<%= end_time.strftime('/events/%Y/%m/%d/%H') %>h0*",
-    "filePattern": "part-*"
+    "paths": "<%= files.join(',') %>",
+    "filePattern": "*"
   },
   "rollupSpec": { "aggs": [
                     { "type": "count", "name":"event_count" },
