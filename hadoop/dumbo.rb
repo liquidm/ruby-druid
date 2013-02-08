@@ -16,6 +16,7 @@ hdfs = Druid::HdfsScanner.new :file_pattern => '/events/*/*/*/*/part*', :cache =
 hdfs.scan
 
 raw_start, raw_end = hdfs.range
+raw_start = (raw_start / 3600).floor * 3600 # start at the hour boundary
 raw_end = [raw_end, (Time.now.to_i / 3600).floor * 3600].min # cut off at the last full hour
 
 puts "We got raw data from #{Time.at raw_start} to #{Time.at raw_end}"
@@ -53,7 +54,7 @@ segments.each do |start, info|
 end
 
 intervals = rescan_hours.map do |time|
-  "#{Time.at(time).iso8601}/#{Time.at(time+3600).utc.iso8601}"
+  "#{Time.at(time).utc.iso8601}/#{Time.at(time+3600).utc.iso8601}"
 end
 files = rescan_files.to_a
 
