@@ -12,3 +12,8 @@ group :test, :development do
   gem 'rb-fsevent'
   gem 'webmock'
 end
+
+group :hadoop do
+  gem 'aws-s3'
+  gem 'thread'
+end
