@@ -10,4 +10,5 @@ group :test, :development do
   gem 'ruby_gntp'
   gem 'rspec'
   gem 'rb-fsevent'
+  gem 'webmock'
 end

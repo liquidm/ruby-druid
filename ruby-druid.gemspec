@@ -8,6 +8,8 @@ Gem::Specification.new do |s|
   s.description = "Collection of ruby-based tools and libraries for metamx druid"
   s.authors     = ['Hagen Rother', 'Holger Pillmann']
   s.email       = 'tech@madvertise.de'
-  s.files       = FileList['druid.rb', 'lib/*.rb'].to_a
+  s.files       = ['lib/druid.rb']
+  s.add_dependency 'zk'
+  s.add_dependency 'rest-client'
   s.homepage    = 'http://www.madvertise.de'
 end

@@ -4,9 +4,16 @@ require 'json'
 module Druid
   class Query
 
-    def initialize(source)
+    attr_accessor :client
+
+    def initialize(source, client = nil)
       @properties = {}
+      @client = client
       data_source(source)
+    end
+
+    def send
+      @client.send(self)
     end
 
     def query_type(type)

@@ -1,6 +1,4 @@
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'query'
+require "spec_helper"
 
 describe Druid::Query do
 
@@ -30,7 +28,7 @@ describe Druid::Query do
 
   it 'build a post aggregation with a constant right' do
     @query.postagg{(a + 1).as ctr }
-    
+
     JSON.parse(@query.to_json)['postAggregations'].should == [{"type"=>"arithmetic",
       "fn"=>"+",
       "fields"=>
