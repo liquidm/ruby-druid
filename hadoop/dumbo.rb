@@ -58,9 +58,9 @@ intervals = rescan_hours.map do |time|
 end
 files = rescan_files.to_a
 
-puts 'Writing template'
+puts 'Writing druidimport.conf for batch ingestion'
 
 IO.write(state_file_name, hdfs.to_json)
 IO.write(File.join(base_dir, 'druidimport.conf'), template.result(binding))
 
-puts 'And we are out'
+puts 'And we are out. Hadoop, start your engines!'
