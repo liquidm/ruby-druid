@@ -250,7 +250,7 @@ module Druid
       to_hash.to_s
     end
 
-    def as_json
+    def as_json(*a)
       to_hash
     end
 
