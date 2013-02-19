@@ -1,7 +1,6 @@
 source :rubygems
 
 gem 'zk'
-gem 'rest-client'
 
 group :test, :development do
 	gem	'guard'
@@ -11,9 +10,5 @@ group :test, :development do
   gem 'rspec'
   gem 'rb-fsevent'
   gem 'webmock'
-end
-
-group :hadoop do
-  gem 'aws-s3'
-  gem 'thread'
+  gem 'rest-client'
 end

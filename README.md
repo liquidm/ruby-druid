@@ -1,6 +1,6 @@
 # Ruby-druid
 
-A ruby query DSL for [druid](https://github.com/madvertise/druid).
+A ruby client for [druid](https://github.com/madvertise/druid).
 
 ruby-druid generates complete JSON queries by chaining methods.
 The resulting JSON can be send directly to a druid server or handled seperatly.
