@@ -1,9 +1,9 @@
 # Ruby-druid
 
-  Ruby query DSL for metamx druid.
+A ruby query DSL for [druid](https://github.com/madvertise/druid).
 
-ruby druid generates complete JSON queries by chaining methods.
-The JSON can be send directly to  a druid server or handled seperatly.
+ruby-druid generates complete JSON queries by chaining methods.
+The resulting JSON can be send directly to a druid server or handled seperatly.
 
 ## Getting started
 
@@ -78,7 +78,7 @@ The interval for the query takes a string with date and time or objects that pro
 ```ruby
 query = Druid::Query.new('service/source').long_sum(:aggregate1)
 
-query.interval("2013-07-03T00", Time.now)
+query.interval("2013-01-01T00", Time.now)
 ```
 
 ### granularity
