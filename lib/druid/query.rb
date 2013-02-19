@@ -4,8 +4,6 @@ require 'json'
 module Druid
   class Query
 
-    attr_accessor :client
-
     def initialize(source, client = nil)
       @properties = {}
       @client = client
@@ -22,9 +20,14 @@ module Druid
     end
 
     def data_source(source)
-      source = source.split('/').last # strip of service in case it is passed
-      @properties[:dataSource] = source
+      source = source.split('/')
+      @properties[:dataSource] = source.last
+      @service = source.first
       self
+    end
+
+    def source
+      "#{@service}/#{@properties[:dataSource]}"
     end
 
     def group_by(*dimensions)

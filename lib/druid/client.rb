@@ -1,14 +1,14 @@
 module Druid
   class Client
-
-    attr_accessor :uri
-
     def initialize(zookeeper_uri, opts = {})
       @zk = ZooHandler.new zookeeper_uri, opts
     end
 
     def send(query)
-      uri = query.client.uri
+      uri = @zk.data_sources[query.source]
+      raise "data source #{id} (currently) not available" unless uri
+      uri = URI(uri)
+
       req = Net::HTTP::Post.new(uri.path, initheader = {'Content-Type' =>'application/json'})
       req.body = query.to_json#.instance_exec(&block).to_json
 
@@ -27,8 +27,6 @@ module Druid
     def query(id, &block)
       uri = @zk.data_sources[id]
       raise "data source #{id} (currently) not available" unless uri
-      @uri = URI(uri)
-      
       query = Query.new(id, self)
       return query unless block      
 
