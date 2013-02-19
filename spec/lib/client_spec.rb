@@ -42,4 +42,10 @@ describe Druid::Client do
 		expect { client.send(client.query('test/test')) }.to raise_error(RuntimeError, /Request failed: 666: Strange server error/)
 	end
 
+	it 'should have a static setup' do
+		client = Druid::Client.new('test_uri', :static_setup => {'madvertise/mock' => 'mock_uri'})
+		client.data_sources.should == ['madvertise/mock']
+		client.data_source_uri('madvertise/mock').should == URI('mock_uri')
+	end
+
 end
