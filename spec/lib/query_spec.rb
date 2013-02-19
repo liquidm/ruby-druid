@@ -16,13 +16,13 @@ describe Druid::Query do
     JSON.parse(@query.to_json)['queryType'].should == 'query_type'
   end
 
-  it 'sets query type by group' do
-    @query.group()
+  it 'sets query type by group_by' do
+    @query.group_by()
     JSON.parse(@query.to_json)['queryType'].should == 'groupBy'
   end
 
-  it 'takes dimensions from group method' do
-    @query.group(:a, :b, :c)
+  it 'takes dimensions from group_by method' do
+    @query.group_by(:a, :b, :c)
     JSON.parse(@query.to_json)['dimensions'].should == ['a', 'b', 'c']
   end
 
@@ -103,7 +103,7 @@ describe Druid::Query do
     q = [Druid::Query.new('test')]
     q.push q[-1].query_type('a')
     q.push q[-1].data_source('b')
-    q.push q[-1].group('c')
+    q.push q[-1].group_by('c')
     q.push q[-1].long_sum('d')
     q.push q[-1].double_sum('e')
     q.push q[-1].filter{a.eq 1}

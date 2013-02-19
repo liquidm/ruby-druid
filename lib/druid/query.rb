@@ -22,11 +22,12 @@ module Druid
     end
 
     def data_source(source)
+      source = source.split('/').last # strip of service in case it is passed
       @properties[:dataSource] = source
       self
     end
 
-    def group(*dimensions)
+    def group_by(*dimensions)
       query_type(:groupBy)
       @properties[:dimensions] = dimensions.flatten
       self

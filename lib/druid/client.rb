@@ -28,9 +28,8 @@ module Druid
       uri = @zk.data_sources[id]
       raise "data source #{id} (currently) not available" unless uri
       @uri = URI(uri)
-      data_source = id.split('/').last
       
-      query = Query.new(data_source, self)
+      query = Query.new(id, self)
       return query unless block      
 
       send query
