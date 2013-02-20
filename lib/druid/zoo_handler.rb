@@ -97,7 +97,7 @@ module Druid
       result = {}
       @registry.each do |service, brokers|
         brokers.each do |broker|
-          broker[:data_sources].each do |data_source|            
+          broker[:data_sources].each do |data_source|
             result["#{service}/#{data_source}"] = broker[:uri]
           end
         end
