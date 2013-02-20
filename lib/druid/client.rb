@@ -45,5 +45,28 @@ module Druid
       return URI(uri) if uri
       nil
     end
+
+    def data_source(source)
+      uri = data_source_uri(source)
+      raise "data source #{id} (currently) not available" unless uri
+
+      meta_path = "#{uri.path}datasources/#{source.split('/').last}"
+
+      req = Net::HTTP::Get.new(meta_path)
+
+      response = Net::HTTP.new(uri.host, uri.port).start do |http| 
+        http.read_timeout = (2 * 60 * 1000)
+        http.request(req)
+      end
+
+      if response.code == "200"
+        meta = JSON.parse(response.body)
+        meta.define_singleton_method(:dimensions) { self['dimensions'] }
+        meta.define_singleton_method(:metrics) { self['metrics'] }
+        meta
+      else
+        raise "Request failed: #{response.code}: #{response.body}"
+      end
+    end
   end
 end

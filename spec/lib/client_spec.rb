@@ -48,4 +48,22 @@ describe Druid::Client do
 		client.data_source_uri('madvertise/mock').should == URI('mock_uri')
 	end
 
+	it 'should report dimensions of a data source correctly' do
+		stub_request(:get, "http://www.example.com/druid/v2/datasources/mock").
+		  with(:headers =>{'Accept'=>'*/*', 'User-Agent'=>'Ruby'}).
+			to_return(:status => 200, :body => '{"dimensions":["d1","d2","d3"],"metrics":["m1", "m2"]}')
+
+		client = Druid::Client.new('test_uri', :static_setup => {'madvertise/mock' => 'http://www.example.com/druid/v2/'})
+		client.data_source('madvertise/mock').dimensions.should == ["d1","d2","d3"]
+	end
+
+	it 'should report metrics of a data source correctly' do
+		stub_request(:get, "http://www.example.com/druid/v2/datasources/mock").
+		  with(:headers =>{'Accept'=>'*/*', 'User-Agent'=>'Ruby'}).
+			to_return(:status => 200, :body => '{"dimensions":["d1","d2","d3"],"metrics":["m1", "m2"]}')
+
+		client = Druid::Client.new('test_uri', :static_setup => {'madvertise/mock' => 'http://www.example.com/druid/v2/'})
+		client.data_source('madvertise/mock').metrics.should == ["m1","m2"]
+	end
+
 end
