@@ -57,7 +57,7 @@ module Druid
       req = Net::HTTP::Get.new(meta_path)
 
       response = Net::HTTP.new(uri.host, uri.port).start do |http| 
-        http.read_timeout = (2 * 60 * 1000)
+        http.read_timeout = TIMEOUT
         http.request(req)
       end
 
