@@ -1,5 +1,7 @@
 module Druid
   class Client
+    TIMEOUT = 2 * 60 * 1000
+
     def initialize(zookeeper_uri, opts = {})
       if opts[:static_setup]
         @static = opts[:static_setup]
@@ -13,10 +15,10 @@ module Druid
       raise "data source #{id} (currently) not available" unless uri
 
       req = Net::HTTP::Post.new(uri.path, initheader = {'Content-Type' =>'application/json'})
-      req.body = query.to_json#.instance_exec(&block).to_json
+      req.body = query.to_json
 
       response = Net::HTTP.new(uri.host, uri.port).start do |http| 
-        http.read_timeout = (2 * 60 * 1000)
+        http.read_timeout = TIMEOUT
         http.request(req)
       end
 
@@ -31,7 +33,7 @@ module Druid
       uri = data_source_uri(id)
       raise "data source #{id} (currently) not available" unless uri
       query = Query.new(id, self)
-      return query unless block      
+      return query unless block
 
       send query
     end

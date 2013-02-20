@@ -1,21 +1,18 @@
 require 'rake'
 
-Gem::Specification.new do |s|
-  s.name        = 'ruby-druid'
-  s.version     = '0.0.2'
-  s.date        = '2013-02-19'
-  s.summary     = "Ruby client for druid"
-  s.description = "Collection of ruby-based tools and libraries for metamx druid"
-  s.authors     = ['Hagen Rother', 'Holger Pillmann']
-  s.email       = 'tech@madvertise.de'
-  s.files       = [
-    'lib/druid.rb',
-    'lib/druid/client.rb',
-    'lib/druid/query.rb',
-    'lib/druid/response_row.rb',
-    'lib/druid/zoo_handler.rb'
-  ]
-  s.add_dependency 'zk'
-  s.add_dependency 'rest-client'
-  s.homepage    = 'http://www.madvertise.de'
+Gem::Specification.new do |gem|
+  gem.name          = 'ruby-druid'
+  gem.version       = '0.0.2'
+  gem.date          = '2013-02-19'
+  gem.summary       = 'Ruby client for druid'
+  gem.description   = 'Collection of ruby-based tools and libraries for metamx druid'
+  gem.authors       = ['Hagen Rother', 'Holger Pillmann']
+  gem.email         = 'tech@madvertise.de'
+  gem.homepage      = 'https://github.com/madvertise/ruby-druid'
+
+  gem.files         = `git ls-files`.split("\n")
+  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  gem.require_paths = ['lib']
+
+  gem.add_dependency 'zk'
 end

@@ -1,5 +1,11 @@
+PATH
+  remote: .
+  specs:
+    ruby-druid (0.0.2)
+      zk
+
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     addressable (2.3.2)
     coderay (1.0.8)
@@ -61,6 +67,7 @@ DEPENDENCIES
   rb-fsevent
   rest-client
   rspec
+  ruby-druid!
   ruby_gntp
   webmock
   zk
