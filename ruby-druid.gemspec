@@ -15,4 +15,5 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
 
   gem.add_dependency 'zk'
+  gem.add_dependency 'rest-client'
 end
