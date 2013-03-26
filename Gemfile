@@ -2,9 +2,6 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'zk'
-gem 'rest-client'
-
 group :test, :development do
   gem 'guard'
   gem 'guard-bundler'
@@ -13,4 +10,11 @@ group :test, :development do
   gem 'rspec'
   gem 'ruby_gntp'
   gem 'webmock'
+end
+
+group :console do
+  gem 'activesupport'
+  gem 'awesome_print'
+  gem 'ripl'
+  gem 'terminal-table'
 end

@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+$:.unshift(File.join(File.expand_path("../..", __FILE__), 'lib'))
+
+$0 = "dripl"
+
+def uri(value)
+  @uri = value
+end
+
+def source(value)
+  @source = value
+end
+
+driplrc = File.join(File.expand_path("../..", __FILE__), '.driplrc')
+instance_eval(File.read(driplrc))
+
+require 'druid/console'
+Druid::Console.new(@uri, @source)
