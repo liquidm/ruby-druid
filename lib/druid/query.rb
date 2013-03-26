@@ -4,10 +4,16 @@ require 'json'
 module Druid
   class Query
 
+    attr_reader :properties
+
     def initialize(source, client = nil)
       @properties = {}
       @client = client
+
+      # set some defaults
       data_source(source)
+      granularity(:all)
+      interval(Time.now - 86400, Time.now)
     end
 
     def send
@@ -42,6 +48,7 @@ module Druid
       agg_type = agg_type.join
 
       define_method method_name do |*metrics|
+        query_type(:groupBy)
         aggregations = (@properties[:aggregations] || []).select{|agg| agg[:type] != agg_type }
         aggregations.concat(metrics.flatten.map{ |metric|
           {
@@ -78,12 +85,18 @@ module Druid
       self
     end
 
-    def interval(from, to)
+    def interval(from, to = Time.now)
+      from = Time.now + from if from.is_a?(Fixnum)
+      to = Time.now + to if to.is_a?(Fixnum)
+
       from = DateTime.parse(from.to_s) unless from.respond_to? :iso8601
       to = DateTime.parse(to.to_s) unless to.respond_to? :iso8601
+
       @properties[:intervals] = ["#{from.iso8601}/#{to.iso8601}"]
       self
     end
+
+    alias_method :[], :interval
 
     def granularity(gran)
       @properties[:granularity] = gran.to_s
