@@ -3,7 +3,7 @@ require 'rake'
 Gem::Specification.new do |gem|
   gem.name          = 'ruby-druid'
   gem.version       = '0.0.3'
-  gem.date          = '2013-02-20'
+  gem.date          = '2013-04-03'
   gem.summary       = 'Ruby client for druid'
   gem.description   = 'Ruby client for metamx druid'
   gem.authors       = ['Hagen Rother', 'Holger Pillmann']

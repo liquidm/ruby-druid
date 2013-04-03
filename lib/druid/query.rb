@@ -98,8 +98,26 @@ module Druid
 
     alias_method :[], :interval
 
-    def granularity(gran)
-      @properties[:granularity] = gran.to_s
+    def granularity(gran, time_zone = nil)
+      gran = gran.to_s
+      case gran
+      when 'none', 'all', 'minute', 'fifteen_minute', 'thirthy_minute', 'hour'
+        @properties[:granularity] = gran
+        return self
+      when 'day'
+        gran = 'P1D'
+      end
+
+      time_zone ||= Time.now.strftime('%Z')
+      # druid doesn't seem to understand 'CEST'
+      # this is a work around
+      time_zone = 'Europe/Berlin' if time_zone == 'CEST'
+
+      @properties[:granularity] = {
+        :type => 'period',
+        :period => gran,
+        :timeZone => time_zone
+      }
       self
     end
 

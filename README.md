@@ -85,10 +85,26 @@ query.interval("2013-01-01T00", Time.now)
 
 granularity can be `:all`, `:none`, `:minute`, `:fifteen_minute`, `:thirthy_minute`, `:hour` or `:day`.
 
+It can also be a period granularity as described in https://github.com/metamx/druid/wiki/Granularities.
+
+The period `'day'` or `:day` will be interpreted as `'P1D'`.
+
+If a period granularity is specifed, the (optional) second parameter is a time zone. It defaults
+to the machines local time zone.
+
+I.E:
 ```ruby
 query = Druid::Query.new('service/source').long_sum(:aggregate1)
 
 query.granularity(:day)
+```
+
+is (on my box) the same as
+
+```ruby
+query = Druid::Query.new('service/source').long_sum(:aggregate1)
+
+query.granularity('P1D', 'Europe/Berlin')
 ```
 
 ## filter

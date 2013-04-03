@@ -130,6 +130,15 @@ describe Druid::Query do
     JSON.parse(@query.to_json)['granularity'].should == 'all'
   end
 
+  it 'should take a period' do
+    @query.granularity(:day, 'CEST')
+    @query.properties[:granularity].should == {
+      :type => "period",
+      :period => "P1D",
+      :timeZone => "Europe/Berlin"
+    }
+  end
+
   it 'creates an equals filter' do
     @query.filter{a.eq 1}
     JSON.parse(@query.to_json)['filter'].should == {"type"=>"selector", "dimension"=>"a", "value"=>1}
