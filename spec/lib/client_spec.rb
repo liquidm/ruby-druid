@@ -23,23 +23,23 @@ describe Druid::Client do
 
 	it 'parses response on 200' do
 		stub_request(:post, "http://www.example.com/druid/v2").
-			with(:body => "{\"dataSource\":\"test\"}",
+			with(:body => "{\"dataSource\":\"test\",\"granularity\":\"all\",\"intervals\":[\"2013-04-04T00:00:00+00:00/2013-04-04T00:00:00+00:00\"]}",
 			:headers => {'Accept'=>'*/*', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
 			to_return(:status => 200, :body => "[]", :headers => {})
 		Druid::ZooHandler.stub!(:new).and_return(mock(Druid::ZooHandler, :data_sources => {'test/test' => 'http://www.example.com/druid/v2'}))
 		client = Druid::Client.new('test_uri')
 		JSON.should_receive(:parse).and_return([])
-		client.send(client.query('test/test'))
+		client.send(client.query('test/test').interval("2013-04-04", "2013-04-04"))
 	end
 
 	it 'raises on request failure' do
 		stub_request(:post, "http://www.example.com/druid/v2").
-			with(:body => "{\"dataSource\":\"test\"}",
+			with(:body => "{\"dataSource\":\"test\",\"granularity\":\"all\",\"intervals\":[\"2013-04-04T00:00:00+00:00/2013-04-04T00:00:00+00:00\"]}",
 			:headers => {'Accept'=>'*/*', 'Content-Type'=>'application/json', 'User-Agent'=>'Ruby'}).
 			to_return(:status => 666, :body => "Strange server error", :headers => {})
 		Druid::ZooHandler.stub!(:new).and_return(mock(Druid::ZooHandler, :data_sources => {'test/test' => 'http://www.example.com/druid/v2'}))
 		client = Druid::Client.new('test_uri')
-		expect { client.send(client.query('test/test')) }.to raise_error(RuntimeError, /Request failed: 666: Strange server error/)
+		expect { client.send(client.query('test/test').interval("2013-04-04", "2013-04-04")) }.to raise_error(RuntimeError, /Request failed: 666: Strange server error/)
 	end
 
 	it 'should have a static setup' do

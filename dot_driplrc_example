@@ -1,0 +1,12 @@
+## your zookeeper config. For static scenarios (i.e. ssh tunnels) see options
+##
+# zookeeper "localhost:2181/druid"
+
+## using options, you can disable zookeeper lookup
+## options[:static_setup], the key is the source name, the value is the brokers post uri
+##
+# options :static_setup => { 'example/events' => 'http://localhost:8080/druid/v2/' }
+
+## dripl will default to use the first available data source. use this to override
+##
+# source "example/events"

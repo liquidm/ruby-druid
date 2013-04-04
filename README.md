@@ -1,9 +1,68 @@
-# Ruby-druid
+# ruby-druid
 
 A ruby client for [druid](https://github.com/madvertise/druid).
 
 ruby-druid generates complete JSON queries by chaining methods.
 The resulting JSON can be send directly to a druid server or handled seperatly.
+
+## bin/dripl
+
+ruby-druid now includes a repl:
+
+```ruby
+$ bin/dripl
+>> metrics
+[
+    [0] "actions"
+]
+
+>> dimensions
+[
+    [0] "actions"
+]
+
+>> long_sum(:actions)
++---------+
+| actions |
++---------+
+|   98575 |
++---------+
+
+>> long_sum(:actions)[-7.days].granularity(:day)
++-------------------------------+----------+
+| timestamp                     | actions  |
++-------------------------------+----------+
+| 2013-03-28T00:00:00.000+01:00 |   93371  |
+| 2013-03-29T00:00:00.000+01:00 |   448200 |
+| 2013-03-30T00:00:00.000+01:00 |   117167 |
+| 2013-03-31T00:00:00.000+01:00 |   828321 |
+| 2013-04-01T00:00:00.000+02:00 |   261578 |
+| 2013-04-02T00:00:00.000+02:00 |   05149  |
+| 2013-04-03T00:00:00.000+02:00 |   27512  |
+| 2013-04-04T00:00:00.000+02:00 |   18897  |
++-------------------------------+----------+
+
+>> long_sum(:actions)[-7.days].granularity(:day).properties
+{
+      :dataSource => "events",
+     :granularity => {
+            :type => "period",
+          :period => "P1D",
+        :timeZone => "Europe/Berlin"
+    },
+       :intervals => [
+        [0] "2013-03-28T11:57:20+01:00/2013-04-04T11:57:20+02:00"
+    ],
+       :queryType => :groupBy,
+    :aggregations => [
+        [0] {
+                 :type => "longSum",
+                 :name => :actions,
+            :fieldName => :actions
+        }
+    ]
+}
+```
 
 ## Getting started
 

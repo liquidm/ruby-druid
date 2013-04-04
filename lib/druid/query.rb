@@ -13,7 +13,9 @@ module Druid
       # set some defaults
       data_source(source)
       granularity(:all)
-      interval(Time.now - 86400, Time.now)
+
+      today = Time.at ((Time.now.to_i / 86400.0).floor * 86400)
+      interval(today, today + 86400)
     end
 
     def send

@@ -8,16 +8,19 @@ require 'terminal-table'
 require 'druid'
 
 Ripl::Shell.class_eval do
-  def format_query_result(result)
+  def format_query_result(result, query)
+
+    include_timestamp = query.properties[:granularity] != 'all'
+
     Terminal::Table.new({
-      headings: result.last.keys,
-      rows: result.map(&:values),
+      headings: (include_timestamp ? ["timestamp"] : []) + result.last.keys,
+      rows: result.map { |row| (include_timestamp ? [row.timestamp] : []) + row.values }
     })
   end
 
   def format_result(result)
     if result.is_a?(Druid::Query)
-      puts format_query_result(result.send)
+      puts format_query_result(result.send, result)
     else
       ap(result)
     end
@@ -29,13 +32,15 @@ module Druid
 
     extend Forwardable
 
-    def initialize(uri, source)
-      @uri, @source = uri, source
+    def initialize(uri, source, options)
+      @uri, @source, @options = uri, source, options
       Ripl.start(binding: binding)
     end
 
     def client
-      @client ||= Druid::Client.new(@uri)
+      @client ||= Druid::Client.new(@uri, @options)
+      @source ||= @client.data_sources[0]
+      @client
     end
 
     def source
