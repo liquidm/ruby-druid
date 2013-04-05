@@ -14,8 +14,11 @@ module Druid
       data_source(source)
       granularity(:all)
 
-      today = Time.at ((Time.now.to_i / 86400.0).floor * 86400)
-      interval(today, today + 86400)
+      interval(today)
+    end
+
+    def today
+      Time.now.to_date.to_time
     end
 
     def send
@@ -88,8 +91,8 @@ module Druid
     end
 
     def interval(from, to = Time.now)
-      from = Time.now + from if from.is_a?(Fixnum)
-      to = Time.now + to if to.is_a?(Fixnum)
+      from = today + from if from.is_a?(Fixnum)
+      to = today + to if to.is_a?(Fixnum)
 
       from = DateTime.parse(from.to_s) unless from.respond_to? :iso8601
       to = DateTime.parse(to.to_s) unless to.respond_to? :iso8601
@@ -196,7 +199,7 @@ module Druid
 
   class FilterParameter
     (instance_methods + private_instance_methods).each do |method|
-      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect)/ || method.to_s =~ /\?/
+      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect|class)/ || method.to_s =~ /\?/
         undef_method method
       end
     end

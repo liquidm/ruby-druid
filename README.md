@@ -51,7 +51,7 @@ $ bin/dripl
         :timeZone => "Europe/Berlin"
     },
        :intervals => [
-        [0] "2013-03-28T11:57:20+01:00/2013-04-04T11:57:20+02:00"
+        [0] "2013-03-28T00:00:00+01:00/2013-04-04T11:57:20+02:00"
     ],
        :queryType => :groupBy,
     :aggregations => [
