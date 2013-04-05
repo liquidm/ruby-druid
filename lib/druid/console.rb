@@ -12,8 +12,10 @@ Ripl::Shell.class_eval do
 
     include_timestamp = query.properties[:granularity] != 'all'
 
+    keys = result.empty? ? [] : result.last.keys
+
     Terminal::Table.new({
-      headings: (include_timestamp ? ["timestamp"] : []) + result.last.keys,
+      headings: (include_timestamp ? ["timestamp"] : []) + keys,
       rows: result.map { |row| (include_timestamp ? [row.timestamp] : []) + row.values }
     })
   end
