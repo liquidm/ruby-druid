@@ -11,6 +11,14 @@ module Druid
       @discovery_path = opts[:discovery_path] || '/discoveryPath'
       @watched_services = Hash.new
 
+      init_zookeeper
+    end
+
+    def init_zookeeper
+      @zk.on_expired_session do
+        init_zookeeper
+      end
+
       @zk.register(@discovery_path, :only => :child) do |event|
         check_services
       end

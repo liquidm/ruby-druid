@@ -2,7 +2,7 @@ require 'rake'
 
 Gem::Specification.new do |gem|
   gem.name          = 'ruby-druid'
-  gem.version       = '0.0.5'
+  gem.version       = '0.0.6'
   gem.date          = '2013-04-04'
   gem.summary       = 'Ruby client for druid'
   gem.description   = 'Ruby client for metamx druid'
