@@ -51,7 +51,7 @@ module Druid
 
     def data_source(source)
       uri = data_source_uri(source)
-      raise "data source #{id} (currently) not available" unless uri
+      raise "data source #{source} (currently) not available" unless uri
 
       meta_path = "#{uri.path}datasources/#{source.split('/').last}"
 
