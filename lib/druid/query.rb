@@ -106,7 +106,7 @@ module Druid
     def granularity(gran, time_zone = nil)
       gran = gran.to_s
       case gran
-      when 'none', 'all', 'minute', 'fifteen_minute', 'thirthy_minute', 'hour'
+      when 'none', 'all', 'minute', 'fifteen_minute', 'thirty_minute', 'hour'
         @properties[:granularity] = gran
         return self
       when 'day'
