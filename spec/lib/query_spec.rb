@@ -120,6 +120,11 @@ describe Druid::Query do
     JSON.parse(@query.to_json)['intervals'].should == ['2013-01-26T00:00:00+00:00/2020-01-26T00:15:00+00:00']
   end
 
+  it 'takes multiple intervals' do
+    @query.intervals([['2013-01-26T0', '2020-01-26T00:15'],['2013-04-23T0', '2013-04-23T15:00']])
+    JSON.parse(@query.to_json)['intervals'].should == ["2013-01-26T00:00:00+00:00/2020-01-26T00:15:00+00:00", "2013-04-23T00:00:00+00:00/2013-04-23T15:00:00+00:00"]
+  end
+
   it 'accepts Time objects for intervals' do
     @query.interval(a = Time.now, b = Time.now + 1)
     JSON.parse(@query.to_json)['intervals'].should == ["#{a.iso8601}/#{b.iso8601}"]

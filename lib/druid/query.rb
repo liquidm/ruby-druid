@@ -91,13 +91,11 @@ module Druid
     end
 
     def interval(from, to = Time.now)
-      from = today + from if from.is_a?(Fixnum)
-      to = today + to if to.is_a?(Fixnum)
+      intervals([[from, to]])
+    end
 
-      from = DateTime.parse(from.to_s) unless from.respond_to? :iso8601
-      to = DateTime.parse(to.to_s) unless to.respond_to? :iso8601
-
-      @properties[:intervals] = ["#{from.iso8601}/#{to.iso8601}"]
+    def intervals(is)
+      @properties[:intervals] = is.map{ |ii| mk_interval(ii[0], ii[1]) }
       self
     end
 
@@ -128,6 +126,17 @@ module Druid
 
     def to_json
       @properties.to_json
+    end
+
+    private
+
+    def mk_interval(from, to)
+      from = today + from if from.is_a?(Fixnum)
+      to = today + to if to.is_a?(Fixnum)
+
+      from = DateTime.parse(from.to_s) unless from.respond_to? :iso8601
+      to = DateTime.parse(to.to_s) unless to.respond_to? :iso8601
+      "#{from.iso8601}/#{to.iso8601}"
     end
 
   end

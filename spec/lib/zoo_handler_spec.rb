@@ -82,6 +82,9 @@ module ZK
       @paths[uri] = values
       @registrations[uri].call if @registrations[uri]
     end
+
+    def on_expired_session
+    end
   end
 end
 
