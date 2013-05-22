@@ -67,6 +67,8 @@ module Druid
       end
     end
 
+    alias_method :sum, :long_sum
+
     def postagg(&block)
       post_agg = PostAggregation.new.instance_exec(&block)
       @properties[:postAggregations] = post_agg
@@ -230,10 +232,12 @@ module Druid
     def initialize(name)
       @name = name
       @value = nil
+      @regexp = nil
     end
 
     def eq(value)
       return self.in(value) if value.is_a? Array
+      return self.regexp(value) if value.is_a? Regexp
       @value = value
       self
     end
@@ -252,8 +256,7 @@ module Druid
       raise "Must provide non-empty array in in()" if values.empty?
 
       if (values.length == 1)
-        @value = values[0]
-        return self
+        return self.eq(values[0])
       end
 
       filter_or = FilterOperator.new('or', true)
@@ -286,13 +289,25 @@ module Druid
       filter_not
     end
 
+    def regexp(r)
+      r = Regexp.new(r) unless r.is_a? Regexp
+      @regexp = r.inspect[1...-1] #to_s doesn't work
+      self
+    end
+
     def to_hash
-      raise 'no value assigned' if @value.nil?
-      {
-        :type => 'selector',
-        :dimension => @name,
-        :value => @value
+      raise 'no value assigned' unless @value.nil? ^ @regexp.nil?
+      hash = {
+        :dimension => @name
       }
+      if @value
+        hash['type'] = 'selector'
+        hash['value'] = @value
+      elsif @regexp
+        hash['type'] = 'regex'
+        hash['pattern'] = @regexp
+      end
+      hash
     end
 
     def to_s

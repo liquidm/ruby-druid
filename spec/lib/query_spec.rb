@@ -258,4 +258,31 @@ end
     expect { @query.filter{a.eq}.to_json}.to raise_error 'wrong number of arguments (0 for 1)'
   end
 
+  it 'should query regexp using .regexp(string)' do
+    JSON.parse(@query.filter{a.regexp('[1-9].*')}.to_json)['filter'].should == {
+      "dimension"=>"a",
+      "type"=>"regex",
+      "pattern"=>"[1-9].*"
+    }
+  end
+
+  it 'should query regexp using .eq(regexp)' do
+    JSON.parse(@query.filter{a.in(/abc.*/)}.to_json)['filter'].should == {
+      "dimension"=>"a",
+      "type"=>"regex",
+      "pattern"=>"abc.*"
+    }
+  end
+
+  it 'should query regexp using .in([regexp])' do
+    JSON.parse(@query.filter{ a.in(['b', /[a-z].*/, 'c']) }.to_json)['filter'].should == {
+      "type"=>"or",
+      "fields"=>[
+        {"dimension"=>"a", "type"=>"selector", "value"=>"b"},
+        {"dimension"=>"a", "type"=>"regex", "pattern"=>"[a-z].*"},
+        {"dimension"=>"a", "type"=>"selector", "value"=>"c"}
+      ]
+    }
+  end
+
 end
