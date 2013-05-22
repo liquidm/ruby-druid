@@ -102,14 +102,19 @@ module Druid
     end
 
     def data_sources
-      result = {}
+      result = Hash.new { |hash, key| hash[key] = [] }
+
       @registry.each do |service, brokers|
         brokers.each do |broker|
           broker[:data_sources].each do |data_source|
-            result["#{service}/#{data_source}"] = broker[:uri]
+            result["#{service}/#{data_source}"] << broker[:uri]
           end
         end
       end
+      result.each do |source, uris|
+        result[source] = uris.sample if uris.respond_to?(:sample)
+      end
+
       result
     end
 
