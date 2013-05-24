@@ -8,6 +8,7 @@ module Druid
     end
 
     attr_reader :timestamp
+    attr_reader :row
 
     def initialize(row)
       @timestamp = row['timestamp']
