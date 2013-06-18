@@ -13,7 +13,7 @@ module Druid
 
     def send(query)
       uri = data_source_uri(query.source)
-      raise "data source #{id} (currently) not available" unless uri
+      raise "data source #{query.source} (currently) not available" unless uri
 
       req = Net::HTTP::Post.new(uri.path, initheader = {'Content-Type' =>'application/json'})
       req.body = query.to_json
