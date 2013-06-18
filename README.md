@@ -132,7 +132,7 @@ It is required to aggregate all fields from a postaggregation with `long_sum`.
 
 ### interval
 
-The interval for the query takes a string with date and time or objects that provide a `iso8601` method 
+The interval for the query takes a string with date and time or objects that provide a `iso8601` method
 
 ```ruby
 query = Druid::Query.new('service/source').long_sum(:aggregate1)

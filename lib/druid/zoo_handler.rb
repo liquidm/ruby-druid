@@ -52,7 +52,7 @@ module Druid
           end
           check_service service
         end
-        
+
         known = @registry[service].map{ |node| node[:name] } rescue []
         live = @zk.children(watchPath, :watch => true)
 

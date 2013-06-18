@@ -176,7 +176,7 @@ describe Druid::ZooHandler do
     calls.should == [['b3', 83]]
     zk.services.should == ['a', 'b']
     zk.data_sources.should == {
-      "a/s1" => "http://b1_address:80/druid/v2/", 
+      "a/s1" => "http://b1_address:80/druid/v2/",
       "a/s2" => "http://b1_address:80/druid/v2/",
       "b/s3" => "http://b2_address:90/druid/v2/",
       "b/s4" => "http://b2_address:90/druid/v2/",

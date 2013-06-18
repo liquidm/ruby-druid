@@ -18,7 +18,7 @@ module Druid
       req = Net::HTTP::Post.new(uri.path, initheader = {'Content-Type' =>'application/json'})
       req.body = query.to_json
 
-      response = Net::HTTP.new(uri.host, uri.port).start do |http| 
+      response = Net::HTTP.new(uri.host, uri.port).start do |http|
         http.read_timeout = TIMEOUT
         http.request(req)
       end
@@ -57,7 +57,7 @@ module Druid
 
       req = Net::HTTP::Get.new(meta_path)
 
-      response = Net::HTTP.new(uri.host, uri.port).start do |http| 
+      response = Net::HTTP.new(uri.host, uri.port).start do |http|
         http.read_timeout = TIMEOUT
         http.request(req)
       end

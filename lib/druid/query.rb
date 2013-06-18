@@ -151,7 +151,7 @@ module Druid
     end
 
     def method_missing(name, *args, &block)
-      PostAggregationField.new(name)     
+      PostAggregationField.new(name)
     end
 
     def to_json(*a)
@@ -163,7 +163,7 @@ module Druid
 
     def initialize(left, name, right)
       @name = name
-      right = PostAggregationConstant.new(1) if right.is_a? Numeric 
+      right = PostAggregationConstant.new(1) if right.is_a? Numeric
 
       @values = [left, right]
     end
