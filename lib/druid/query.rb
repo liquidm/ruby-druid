@@ -71,7 +71,8 @@ module Druid
 
     def postagg(&block)
       post_agg = PostAggregation.new.instance_exec(&block)
-      @properties[:postAggregations] = post_agg
+      @properties[:postAggregations] ||= []
+      @properties[:postAggregations] << post_agg
       self
     end
 
@@ -173,7 +174,7 @@ module Druid
     end
 
     def to_json(*a)
-      [{ "type" => "arithmetic", "fn" => @name, "fields" => @values, "name" => @as}].to_json
+      { "type" => "arithmetic", "fn" => @name, "fields" => @values, "name" => @as}.to_json
     end
   end
 

@@ -77,6 +77,24 @@ describe Druid::Query do
     "name"=>"ctr"}]
   end
 
+  it 'chains aggregations' do
+    @query.postagg{(a / b).as ctr }.postagg{(b / a).as rtc }
+
+    JSON.parse(@query.to_json)['postAggregations'].should == [{"type"=>"arithmetic",
+      "fn"=>"/",
+      "fields"=>
+      [{"type"=>"fieldAccess", "name"=>"a", "fieldName"=>"a"},
+      {"type"=>"fieldAccess", "name"=>"b", "fieldName"=>"b"}],
+    "name"=>"ctr"},
+    {"type"=>"arithmetic",
+      "fn"=>"/",
+      "fields"=>
+      [{"type"=>"fieldAccess", "name"=>"b", "fieldName"=>"b"},
+      {"type"=>"fieldAccess", "name"=>"a", "fieldName"=>"a"}],
+    "name"=>"rtc"}
+    ]
+  end
+
   it 'builds aggregations on long_sum' do
     @query.long_sum(:a, :b, :c)
     JSON.parse(@query.to_json)['aggregations'].should == [
@@ -85,6 +103,7 @@ describe Druid::Query do
       { 'type' => 'longSum', 'name' => 'c', 'fieldName' => 'c'}
     ]
   end
+
 
   it 'removes old long_sum properties from aggregations on calling long_sum again' do
     @query.long_sum(:a, :b, :c)
