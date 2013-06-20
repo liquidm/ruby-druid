@@ -173,8 +173,16 @@ module Druid
       self
     end
 
+    def to_hash
+      { "type" => "arithmetic", "fn" => @name, "fields" => @values, "name" => @as}
+    end
+
+    def as_json(*a)
+      to_hash
+    end
+
     def to_json(*a)
-      { "type" => "arithmetic", "fn" => @name, "fields" => @values, "name" => @as}.to_json
+      to_hash.to_json(*a)
     end
   end
 
@@ -192,8 +200,16 @@ module Druid
       end
     end
 
+    def to_hash
+      {"type" => "fieldAccess", "name" => @name, "fieldName" => @name}
+    end
+
+    def as_json(*a)
+      to_hash
+    end
+
     def to_json(*a)
-      {"type" => "fieldAccess", "name" => @name, "fieldName" => @name}.to_json
+      to_hash.to_json(*a)
     end
   end
 
@@ -203,8 +219,16 @@ module Druid
       @name = name
     end
 
+    def to_hash
+      {'type' => 'constant', 'value' => @name }
+    end
+
+    def as_json(*a)
+      to_hash
+    end
+
     def to_json(*a)
-      {'type' => 'constant', 'value' => @name }.to_json
+      to_hash.to_json(*a)
     end
 
   end
