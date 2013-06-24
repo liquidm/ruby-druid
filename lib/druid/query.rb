@@ -54,14 +54,14 @@ module Druid
 
       define_method method_name do |*metrics|
         query_type(:groupBy)
-        aggregations = (@properties[:aggregations] || []).select{|agg| agg[:type] != agg_type }
+        aggregations = @properties[:aggregations] || []
         aggregations.concat(metrics.flatten.map{ |metric|
           {
             :type => agg_type,
-            :name => metric,
-            :fieldName => metric
+            :name => metric.to_s,
+            :fieldName => metric.to_s
           }
-        })
+        }).uniq!
         @properties[:aggregations] = aggregations
         self
       end
@@ -69,11 +69,22 @@ module Druid
 
     alias_method :sum, :long_sum
 
-    def postagg(&block)
+    def postagg(type=:long, &block)
       post_agg = PostAggregation.new.instance_exec(&block)
       @properties[:postAggregations] ||= []
       @properties[:postAggregations] << post_agg
+
+      # make sure, the required fields are in the query
+      field_type = (type.to_s + '_sum').to_sym
+      # ugly workaround, because SOMEONE overwrote send
+      sum_method = self.method(field_type)
+      sum_method.call(post_agg.get_field_names)
+
       self
+    end
+
+    def postagg_double(&block)
+      postagg(:double, &block)
     end
 
     def filter(hash = nil, &block)
@@ -166,6 +177,10 @@ module Druid
       right = PostAggregationConstant.new(1) if right.is_a? Numeric
 
       @values = [left, right]
+    end
+
+    def get_field_names
+      @values.map { |value| value.name }
     end
 
     def as(output_field)

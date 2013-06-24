@@ -77,6 +77,12 @@ describe Druid::Query do
     "name"=>"ctr"}]
   end
 
+  it 'adds fields required by the postagg operation to longsum' do
+    @query.postagg{ (a/b).as c }
+    JSON.parse(@query.to_json)['aggregations'].should == [{"type"=>"longSum", "name"=>"a", "fieldName"=>"a"},
+                                                          {"type"=>"longSum", "name"=>"b", "fieldName"=>"b"}]
+  end
+
   it 'chains aggregations' do
     @query.postagg{(a / b).as ctr }.postagg{(b / a).as rtc }
 
@@ -105,16 +111,29 @@ describe Druid::Query do
   end
 
 
-  it 'removes old long_sum properties from aggregations on calling long_sum again' do
+  it 'appends long_sum properties from aggregations on calling long_sum again' do
     @query.long_sum(:a, :b, :c)
     @query.double_sum(:x,:y)
     @query.long_sum(:d, :e, :f)
     JSON.parse(@query.to_json)['aggregations'].sort{|x,y| x['name'] <=> y['name']}.should == [
+      { 'type' => 'longSum', 'name' => 'a', 'fieldName' => 'a'},
+      { 'type' => 'longSum', 'name' => 'b', 'fieldName' => 'b'},
+      { 'type' => 'longSum', 'name' => 'c', 'fieldName' => 'c'},
       { 'type' => 'longSum', 'name' => 'd', 'fieldName' => 'd'},
       { 'type' => 'longSum', 'name' => 'e', 'fieldName' => 'e'},
       { 'type' => 'longSum', 'name' => 'f', 'fieldName' => 'f'},
       { 'type' => 'doubleSum', 'name' => 'x', 'fieldName' => 'x'},
       { 'type' => 'doubleSum', 'name' => 'y', 'fieldName' => 'y'}
+    ]
+  end
+
+  it 'removes duplicate aggregation fields' do
+    @query.long_sum(:a, :b)
+    @query.long_sum(:b)
+
+    JSON.parse(@query.to_json)['aggregations'].should == [
+      { 'type' => 'longSum', 'name' => 'a', 'fieldName' => 'a'},
+      { 'type' => 'longSum', 'name' => 'b', 'fieldName' => 'b'},
     ]
   end
 
