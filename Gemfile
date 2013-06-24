@@ -10,6 +10,7 @@ group :test, :development do
   gem 'rspec'
   gem 'ruby_gntp'
   gem 'webmock'
+  gem 'debugger'
 end
 
 group :console do
