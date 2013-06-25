@@ -77,6 +77,18 @@ describe Druid::Query do
     "name"=>"ctr"}]
   end
 
+  it 'build a complex post aggregation' do
+    @query.postagg{((a / b) * 1000).as ctr }
+    JSON.parse(@query.to_json)['postAggregations'].should == [{"type"=>"arithmetic",
+      "fn"=>"*",
+      "fields"=>
+      [{"type"=>"arithmetic", "fn"=>"/", "fields"=>
+        [{"type"=>"fieldAccess", "name"=>"a", "fieldName"=>"a"},
+         {"type"=>"fieldAccess", "name"=>"b", "fieldName"=>"b"}]},
+      {"type"=>"constant", "value"=>1000}],
+    "name"=>"ctr"}]
+  end
+
   it 'adds fields required by the postagg operation to longsum' do
     @query.postagg{ (a/b).as c }
     JSON.parse(@query.to_json)['aggregations'].should == [{"type"=>"longSum", "name"=>"a", "fieldName"=>"a"},

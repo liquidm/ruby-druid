@@ -156,96 +156,113 @@ module Druid
   end
 
   class PostAggregation
+    def method_missing(name, *args)
+      if args.empty?
+        PostAggregationField.new(name)
+      end
+    end
+  end
 
-    def initialize
-      @values = []
+  module PostAggregationOperators
+    def +(value)
+      PostAggregationOperation.new(self, :+, value)
     end
 
-    def method_missing(name, *args, &block)
-      PostAggregationField.new(name)
+    def -(value)
+      PostAggregationOperation.new(self, :-, value)
     end
 
-    def to_json(*a)
-      @values.to_json
+    def *(value)
+      PostAggregationOperation.new(self, :*, value)
+    end
+
+    def /(value)
+      PostAggregationOperation.new(self, :/, value)
     end
   end
 
   class PostAggregationOperation
+    include PostAggregationOperators
 
-    def initialize(left, name, right)
-      @name = name
-      right = PostAggregationConstant.new(1) if right.is_a? Numeric
+    attr_reader :left, :operator, :right, :name
 
-      @values = [left, right]
+    def initialize(left, operator, right)
+      @left = left.is_a?(Numeric) ? PostAggregationConstant.new(left) : left
+      @operator = operator
+      @right = right.is_a?(Numeric) ? PostAggregationConstant.new(right) : right
     end
 
-    def get_field_names
-      @values.map { |value| value.name }
-    end
-
-    def as(output_field)
-      @as = output_field.name
+    def as(field)
+      @name = field.name.to_s
       self
     end
 
-    def to_hash
-      { "type" => "arithmetic", "fn" => @name, "fields" => @values, "name" => @as}
+    def get_field_names
+      field_names = []
+      field_names << left.get_field_names if left.respond_to?(:get_field_names)
+      field_names << right.get_field_names if right.respond_to?(:get_field_names)
+      field_names
     end
 
-    def as_json(*a)
-      to_hash
+    def to_hash
+      hash = { "type" => "arithmetic", "fn" => @operator, "fields" => [@left.to_hash, @right.to_hash] }
+      hash["name"] = @name if @name
+      hash
     end
 
     def to_json(*a)
       to_hash.to_json(*a)
+    end
+
+    def as_json(*a)
+      to_hash
     end
   end
 
   class PostAggregationField
+    include PostAggregationOperators
 
-    attr_accessor :name
+    attr_reader :name
 
     def initialize(name)
       @name = name
     end
 
-    [:+, :-, :/, :*].each do |method_name|
-      define_method method_name do |*params|
-        PostAggregationOperation.new(self, method_name, params[0])
-      end
+    def get_field_names
+      @name
     end
 
     def to_hash
-      {"type" => "fieldAccess", "name" => @name, "fieldName" => @name}
-    end
-
-    def as_json(*a)
-      to_hash
+      { "type" => "fieldAccess", "name" => @name, "fieldName" => @name }
     end
 
     def to_json(*a)
       to_hash.to_json(*a)
+    end
+
+    def as_json(*a)
+      to_hash
     end
   end
 
-  class PostAggregationConstant < PostAggregationField
+  class PostAggregationConstant
+    attr_reader :value
 
-    def initialize(name)
-      @name = name
+    def initialize(value)
+      @value = value
     end
 
     def to_hash
-      {'type' => 'constant', 'value' => @name }
-    end
-
-    def as_json(*a)
-      to_hash
+      { "type" => "constant", "value" => @value }
     end
 
     def to_json(*a)
       to_hash.to_json(*a)
     end
 
+    def as_json(*a)
+      to_hash
+    end
   end
 
   class FilterParameter
