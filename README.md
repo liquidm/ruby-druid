@@ -128,7 +128,7 @@ query = Druid::Query.new('service/source').long_sum([:aggregate1, :aggregate2])
 query.postagg{(aggregate2 + aggregate2).as output_field_name}
 ```
 
-It is required to aggregate all fields from a postaggregation with `long_sum`.
+Required fields for the postaggregation are fetched automatically by the library.
 
 ### interval
 
