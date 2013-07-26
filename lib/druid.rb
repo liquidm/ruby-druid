@@ -1,7 +1,7 @@
-require 'druid/client.rb'
-require 'druid/query.rb'
-require 'druid/response_row.rb'
-require 'druid/zoo_handler.rb'
+require 'druid/client'
+require 'druid/query'
+require 'druid/response_row'
+require 'druid/zoo_handler'
 
 module Druid
 
