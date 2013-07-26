@@ -346,6 +346,26 @@ module Druid
       filter_not
     end
 
+    def >(value)
+      filter_js = FilterJavascript.new(@name, '>', value)
+      filter_js
+    end
+
+    def <(value)
+      filter_js = FilterJavascript.new(@name, '<', value)
+      filter_js
+    end
+
+    def >=(value)
+      filter_js = FilterJavascript.new(@name, '>=', value)
+      filter_js
+    end
+
+    def <=(value)
+      filter_js = FilterJavascript.new(@name, '<=', value)
+      filter_js
+    end
+
     def regexp(r)
       r = Regexp.new(r) unless r.is_a? Regexp
       @regexp = r.inspect[1...-1] #to_s doesn't work
@@ -449,6 +469,38 @@ module Druid
         result[:field] = @elements[0].to_hash
       end
       result
+    end
+  end
+
+  class FilterJavascript < FilterDimension
+    def initialize(dimension, operator, value)
+      @dimension = dimension
+      @operator = operator
+      @value = value
+    end
+
+    def to_json(*a)
+      to_hash.to_json(*a)
+    end
+
+    def as_json(*a)
+      to_hash
+    end
+
+    def to_s
+      to_hash.to_s
+    end
+
+    def as_json(options)
+      to_hash
+    end
+
+    def to_hash
+      {
+        :type => 'javascript',
+        :dimension => @dimension,
+        :function => "function(#{@dimension}) { return(#{@dimension} #{@operator} #{@value}); }"
+      }
     end
   end
 end

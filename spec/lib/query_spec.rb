@@ -276,6 +276,33 @@ end
     "type" => "or"}
   end
 
+  it 'creates a javascript expression with > filter' do
+    @query.filter{a > 100}
+    JSON.parse(@query.to_json)['filter'].should == {
+      "type" => "javascript",
+      "dimension" => "a",
+      "function" => "function(a) { return(a > 100); }"
+    }
+  end
+
+  it 'creates a mixed javascript expression' do
+    @query.filter{(a >= 128) & (a != 256)}
+    JSON.parse(@query.to_json)['filter'].should == {"fields" => [
+      {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 128); }"},
+      {"field" => {"type" => "selector", "dimension" => "a", "value" => 256}, "type" => "not"}
+    ],
+    "type" => "and"}
+  end
+
+  it 'creates a complex javascript expression' do
+    @query.filter{(a >= 4) & (a <= 128)}
+    JSON.parse(@query.to_json)['filter'].should == {"fields" => [
+      {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 4); }"},
+      {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a <= 128); }"}
+    ],
+    "type" => "and"}
+  end
+
   it 'can chain two in statements' do
     @query.filter{a.in([1,2,3]) & b.in([1,2,3])}
     JSON.parse(@query.to_json)['filter'].should == {"type"=>"and", "fields"=>[
