@@ -468,7 +468,7 @@ module Druid
     end
 
     def self.new_comparison(dimension, operator, value)
-      self.new(dimension, "#{dimension} #{operator} #{value}")
+      self.new(dimension, "#{dimension} #{operator} #{value.is_a?(String) ? "'#{value}'" : value}")
     end
 
     def to_hash

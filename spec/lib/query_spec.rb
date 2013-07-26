@@ -295,10 +295,10 @@ end
   end
 
   it 'creates a complex javascript filter' do
-    @query.filter{(a >= 4) & (a <= 128)}
+    @query.filter{(a >= 4) & (a <= '128')}
     JSON.parse(@query.to_json)['filter'].should == {"fields" => [
       {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 4); }"},
-      {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a <= 128); }"}
+      {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a <= '128'); }"}
     ],
     "type" => "and"}
   end
