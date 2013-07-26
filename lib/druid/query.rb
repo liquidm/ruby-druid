@@ -271,6 +271,18 @@ module Druid
         undef_method method
       end
     end
+
+    def to_s
+      to_hash.to_s
+    end
+
+    def as_json(*a)
+      to_hash
+    end
+
+    def to_json(*a)
+      to_hash.to_json(*a)
+    end
   end
 
   class Filter
@@ -386,18 +398,6 @@ module Druid
       end
       hash
     end
-
-    def to_s
-      to_hash.to_s
-    end
-
-    def as_json(*a)
-      to_hash
-    end
-
-    def to_json(*a)
-      to_hash.to_json(*a)
-    end
   end
 
   class FilterOperator < FilterParameter
@@ -443,22 +443,6 @@ module Druid
       end
     end
 
-    def to_json(*a)
-      to_hash.to_json(*a)
-    end
-
-    def as_json(*a)
-      to_hash
-    end
-
-    def to_s
-      to_hash.to_s
-    end
-
-    def as_json(options)
-      to_hash
-    end
-
     def to_hash
       result = {
         :type => @name
@@ -477,22 +461,6 @@ module Druid
       @dimension = dimension
       @operator = operator
       @value = value
-    end
-
-    def to_json(*a)
-      to_hash.to_json(*a)
-    end
-
-    def as_json(*a)
-      to_hash
-    end
-
-    def to_s
-      to_hash.to_s
-    end
-
-    def as_json(options)
-      to_hash
     end
 
     def to_hash
