@@ -276,7 +276,7 @@ end
     "type" => "or"}
   end
 
-  it 'creates a javascript expression with > filter' do
+  it 'creates a javascript with > filter' do
     @query.filter{a > 100}
     JSON.parse(@query.to_json)['filter'].should == {
       "type" => "javascript",
@@ -285,7 +285,7 @@ end
     }
   end
 
-  it 'creates a mixed javascript expression' do
+  it 'creates a mixed javascript filter' do
     @query.filter{(a >= 128) & (a != 256)}
     JSON.parse(@query.to_json)['filter'].should == {"fields" => [
       {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 128); }"},
@@ -294,7 +294,7 @@ end
     "type" => "and"}
   end
 
-  it 'creates a complex javascript expression' do
+  it 'creates a complex javascript filter' do
     @query.filter{(a >= 4) & (a <= 128)}
     JSON.parse(@query.to_json)['filter'].should == {"fields" => [
       {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 4); }"},

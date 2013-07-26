@@ -359,22 +359,27 @@ module Druid
     end
 
     def >(value)
-      filter_js = FilterJavascript.new(@name, '>', value)
+      filter_js = FilterJavascript.new_comparison(@name, '>', value)
       filter_js
     end
 
     def <(value)
-      filter_js = FilterJavascript.new(@name, '<', value)
+      filter_js = FilterJavascript.new_comparison(@name, '<', value)
       filter_js
     end
 
     def >=(value)
-      filter_js = FilterJavascript.new(@name, '>=', value)
+      filter_js = FilterJavascript.new_comparison(@name, '>=', value)
       filter_js
     end
 
     def <=(value)
-      filter_js = FilterJavascript.new(@name, '<=', value)
+      filter_js = FilterJavascript.new_comparison(@name, '<=', value)
+      filter_js
+    end
+
+    def javascript(js)
+      filter_js = FilterJavascript.new(@name, js)
       filter_js
     end
 
@@ -457,17 +462,20 @@ module Druid
   end
 
   class FilterJavascript < FilterDimension
-    def initialize(dimension, operator, value)
+    def initialize(dimension, expression)
       @dimension = dimension
-      @operator = operator
-      @value = value
+      @expression = expression
+    end
+
+    def self.new_comparison(dimension, operator, value)
+      self.new(dimension, "#{dimension} #{operator} #{value}")
     end
 
     def to_hash
       {
         :type => 'javascript',
         :dimension => @dimension,
-        :function => "function(#{@dimension}) { return(#{@dimension} #{@operator} #{@value}); }"
+        :function => "function(#{@dimension}) { return(#{@expression}); }"
       }
     end
   end
