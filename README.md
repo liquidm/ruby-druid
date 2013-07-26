@@ -237,6 +237,22 @@ Druid::Query.new('service/source').filter{a => 1, b =>2, c => 3}
 Druid::Query.new('service/source').filter{a.eq(1) & b.eq(2)}
 ```
 
+### filter >, <, >=, <=
+
+```ruby
+Druid::Query.new('service/source').filter{a >= 1}
+```
+
+### filter javascript
+
+```ruby
+Druid::Query.new('service/source').filter{a.javascript('a >= 1 && a < 5')}
+
+#this also the same as
+
+Druid::Query.new('service/source').filter{(a >= 1) & (a < 5)}
+```
+
 ## Acknowledgements
 
 Post aggregation expression parsing built with the help of [Squeel](https://github.com/ernie/squeel).
