@@ -319,6 +319,13 @@ end
     ]}
   end
 
+  it 'creates a greater than having clause' do
+    @query.having{a > 100}
+    JSON.parse(@query.to_json)['having'].should == {
+      "type"=>"greaterThan", "aggregation"=>"a", "value"=>100
+    }
+  end
+
   it 'does not accept in with empty array' do
     expect { @query.filter{a.in []} }.to raise_error "Must provide non-empty array in in()"
   end

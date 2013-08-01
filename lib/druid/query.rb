@@ -1,4 +1,5 @@
 require 'druid/filter'
+require 'druid/having'
 require 'druid/post_aggregation'
 require 'time'
 require 'json'
@@ -112,6 +113,12 @@ module Druid
 
     def intervals(is)
       @properties[:intervals] = is.map{ |ii| mk_interval(ii[0], ii[1]) }
+      self
+    end
+
+    def having(&block)
+      having = Having.new.instance_exec(&block)
+      @properties[:having] = having
       self
     end
 
