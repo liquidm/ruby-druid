@@ -2,11 +2,11 @@ require 'rake'
 
 Gem::Specification.new do |gem|
   gem.name          = 'ruby-druid'
-  gem.version       = '0.0.9'
-  gem.date          = '2013-05-22'
+  gem.version       = '0.1.0'
+  gem.date          = '2013-08-01'
   gem.summary       = 'Ruby client for druid'
   gem.description   = 'Ruby client for metamx druid'
-  gem.authors       = ['Hagen Rother', 'Holger Pillmann']
+  gem.authors       = 'The madvertise team'
   gem.email         = 'tech@madvertise.de'
   gem.homepage      = 'https://github.com/madvertise/ruby-druid'
 

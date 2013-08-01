@@ -166,7 +166,21 @@ query = Druid::Query.new('service/source').long_sum(:aggregate1)
 query.granularity('P1D', 'Europe/Berlin')
 ```
 
-## filter
+## having (for metrics)
+
+### having >
+
+```ruby
+Druid::Query.new('service/source').having{metric > 10}
+```
+
+### having <
+
+```ruby
+Druid::Query.new('service/source').having{metric < 10}
+```
+
+## filter (for dimensions)
 
 Filters are set by the `filter` method. It takes a block or a hash as parameter.
 
@@ -175,21 +189,21 @@ Filters can be chained `filter{...}.filter{...}`
 ### filter == , eq
 
 ```ruby
-Druid::Query.new('service/source').filter{a.eq 1}
+Druid::Query.new('service/source').filter{dimension.eq 1}
 
 #this is the same as
 
-Druid::Query.new('service/source').filter{a == 1}
+Druid::Query.new('service/source').filter{dimension == 1}
 ```
 
 ### filter != , neq
 
 ```ruby
-Druid::Query.new('service/source').filter{a.neq 1}
+Druid::Query.new('service/source').filter{dimension.neq 1}
 
 #this is the same as
 
-Druid::Query.new('service/source').filter{a != 1}
+Druid::Query.new('service/source').filter{dimension != 1}
 ```
 
 ### filter and
@@ -197,7 +211,7 @@ Druid::Query.new('service/source').filter{a != 1}
 a logical or than can combine all other filters
 
 ```ruby
-Druid::Query.new('service/source').filter{a.neq 1 & b.neq 2}
+Druid::Query.new('service/source').filter{dimension.neq 1 & dimension2.neq 2}
 ```
 
 ### filter or
@@ -205,7 +219,7 @@ Druid::Query.new('service/source').filter{a.neq 1 & b.neq 2}
 a logical or than can combine all other filters
 
 ```ruby
-Druid::Query.new('service/source').filter{a.neq 1 | b.neq 2}
+Druid::Query.new('service/source').filter{dimension.neq 1 | dimension2.neq 2}
 ```
 
 ### filter not
@@ -213,7 +227,7 @@ Druid::Query.new('service/source').filter{a.neq 1 | b.neq 2}
 a logical not than can negate all other filter
 
 ```ruby
-Druid::Query.new('service/source').filter{!a.eq(1)}
+Druid::Query.new('service/source').filter{!dimension.eq(1)}
 ```
 
 ### filter in
@@ -221,7 +235,7 @@ Druid::Query.new('service/source').filter{!a.eq(1)}
 This filter creates a set of equals filters in an and filter.
 
 ```ruby
-Druid::Query.new('service/source').filter{a.in(1,2,3)}
+Druid::Query.new('service/source').filter{dimension.in(1,2,3)}
 ```
 
 ### filter with hash syntax
@@ -230,27 +244,27 @@ sometimes it can be useful to use a hash syntax for filtering
 for example if you already get them from a list or parameterhash
 
 ```ruby
-Druid::Query.new('service/source').filter{a => 1, b =>2, c => 3}
+Druid::Query.new('service/source').filter{dimension => 1, dimension1 =>2, dimension2 => 3}
 
 #this is the same as
 
-Druid::Query.new('service/source').filter{a.eq(1) & b.eq(2)}
+Druid::Query.new('service/source').filter{dimension.eq(1) & dimension1.eq(2) & dimension2.eq(3)}
 ```
 
 ### filter >, <, >=, <=
 
 ```ruby
-Druid::Query.new('service/source').filter{a >= 1}
+Druid::Query.new('service/source').filter{dimension >= 1}
 ```
 
 ### filter javascript
 
 ```ruby
-Druid::Query.new('service/source').filter{a.javascript('a >= 1 && a < 5')}
+Druid::Query.new('service/source').filter{a.javascript('dimension >= 1 && dimension < 5')}
 
 #this also the same as
 
-Druid::Query.new('service/source').filter{(a >= 1) & (a < 5)}
+Druid::Query.new('service/source').filter{(dimension >= 1) & (dimension < 5)}
 ```
 
 ## Acknowledgements
