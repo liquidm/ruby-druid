@@ -6,8 +6,10 @@ module Druid
       opts ||= {}
       if opts[:static_setup]
         @static = opts[:static_setup]
+      else
+        @backup = options[:static_setup] if opts[:fallback]
+        @zk = ZooHandler.new zookeeper_uri, opts
       end
-      @zk = ZooHandler.new zookeeper_uri, opts
     end
 
     def send(query)
@@ -45,11 +47,10 @@ module Druid
     def data_source_uri(source)
       uri = (@zk.nil? ? @static : @zk.data_sources)[source]
       begin
-        return URI(uri) if uri 
+        return URI(uri) if uri
       rescue
-         return URI(@static) if @static
+         return URI(@backup) if @backup
       end
-      nil
     end
 
     def data_source(source)
