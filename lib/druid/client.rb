@@ -50,7 +50,7 @@ module Druid
     end
 
     def ds
-      @cached_data_sources || @zk.nil? ? nil : @zk.data_sources
+      @cached_data_sources || (@zk.data_sources unless @zk.nil?)
     end
 
     def data_sources
