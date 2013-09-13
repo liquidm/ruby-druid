@@ -2,7 +2,9 @@ module Druid
   class Client
     TIMEOUT = 2 * 60 * 1000
 
-    def initialize(zookeeper_uri, opts = {})
+    def initialize(zookeeper_uri, opts = nil)
+      opts ||= {}
+
       if opts[:static_setup] && !opts[:fallback]
         @static = opts[:static_setup]
       else
