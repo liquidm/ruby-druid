@@ -2,13 +2,12 @@ module Druid
   class Client
     TIMEOUT = 2 * 60 * 1000
 
-    def initialize(zookeeper_uri, opts = nil)
-      opts ||= {}
+    def initialize(zookeeper_uri, opts = {})
       if opts[:static_setup] && !opts[:fallback]
         @static = opts[:static_setup]
       else
         @backup = opts[:static_setup] if opts[:fallback]
-        @zk = ZooHandler.new zookeeper_uri, opts
+        zookeeper_caching_management!(zookeeper_uri, opts)
       end
     end
 
@@ -40,12 +39,26 @@ module Druid
       send query
     end
 
+    def zookeeper_caching_management!(zookeeper_uri, opts)
+      @zk = ZooHandler.new(zookeeper_uri, opts)
+
+      unless opts[:zk_keepalive]
+        @cached_data_sources = @zk.data_sources unless @zk.nil?
+
+        @zk.close!
+      end
+    end
+
+    def ds
+      @cached_data_sources || @zk.nil? ? nil : @zk.data_sources
+    end
+
     def data_sources
-      (@zk.nil? ? @static : @zk.data_sources).keys
+      (ds.nil? ? @static : ds).keys
     end
 
     def data_source_uri(source)
-      uri = (@zk.nil? ? @static : @zk.data_sources)[source]
+      uri = (ds.nil? ? @static : ds)[source]
       begin
         return URI(uri) if uri
       rescue
