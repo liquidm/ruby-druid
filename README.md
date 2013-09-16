@@ -1,5 +1,7 @@
 # ruby-druid
 
+[![Code Climate](https://codeclimate.com/github/madvertise/ruby-druid.png)](https://codeclimate.com/github/madvertise/ruby-druid)
+
 A ruby client for [druid](https://github.com/madvertise/druid).
 
 ruby-druid generates complete JSON queries by chaining methods.
