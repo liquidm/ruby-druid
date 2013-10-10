@@ -32,6 +32,10 @@ module Druid
       @properties[:queryType] = type
       self
     end
+    
+    def get_query_type()
+      @properties[:queryType]
+    end
 
     def data_source(source)
       source = source.split('/')
@@ -49,6 +53,10 @@ module Druid
       @properties[:dimensions] = dimensions.flatten
       self
     end
+    
+    def time_series()
+      query_type(:timeseries)
+      self
 
     [:long_sum, :double_sum].each do |method_name|
       agg_type = method_name.to_s.split('_')
@@ -56,7 +64,7 @@ module Druid
       agg_type = agg_type.join
 
       define_method method_name do |*metrics|
-        query_type(:groupBy)
+        query_type(get_query_type())
         aggregations = @properties[:aggregations] || []
         aggregations.concat(metrics.flatten.map{ |metric|
           {
