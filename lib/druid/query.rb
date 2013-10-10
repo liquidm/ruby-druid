@@ -54,8 +54,9 @@ module Druid
       self
     end
     
-    def time_series()
+    def time_series(*aggregations)
       query_type(:timeseries)
+      #@properties[:aggregations] = aggregations.flatten
       self
     end
 
