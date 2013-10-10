@@ -34,7 +34,7 @@ module Druid
     end
     
     def get_query_type()
-      @properties[:queryType]
+      @properties[:queryType] || :groupBy
     end
 
     def data_source(source)
@@ -57,6 +57,7 @@ module Druid
     def time_series()
       query_type(:timeseries)
       self
+    end
 
     [:long_sum, :double_sum].each do |method_name|
       agg_type = method_name.to_s.split('_')
