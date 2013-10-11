@@ -26,6 +26,10 @@ module Druid
       check_services
     end
 
+    def close!
+      @zk.close!
+    end
+
     def check_services
       zk_services = @zk.children @discovery_path, :watch => true
 
