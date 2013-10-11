@@ -61,6 +61,6 @@ module Druid
       client.query(@source)
     end
 
-    def_delegators :query, :group_by, :sum, :long_sum, :postagg, :interval, :granularity, :filter
+    def_delegators :query, :group_by, :sum, :long_sum, :postagg, :interval, :granularity, :filter, :time_series
   end
 end
