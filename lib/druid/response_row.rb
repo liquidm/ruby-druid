@@ -12,7 +12,7 @@ module Druid
 
     def initialize(row)
       @timestamp = row['timestamp']
-      @row = row['event']
+      @row = row['event'] || row['result']
     end
 
     def method_missing(name, *args, &block)

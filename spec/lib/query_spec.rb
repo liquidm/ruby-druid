@@ -20,6 +20,11 @@ describe Druid::Query do
     @query.group_by()
     JSON.parse(@query.to_json)['queryType'].should == 'groupBy'
   end
+  
+  it 'sets query type to timeseries' do
+    @query.time_series()
+    JSON.parse(@query.to_json)['queryType'].should == 'timeseries'
+  end
 
   it 'takes dimensions from group_by method' do
     @query.group_by(:a, :b, :c)
