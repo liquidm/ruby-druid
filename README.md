@@ -105,13 +105,21 @@ all row values by hashlike syntax (i.e. `row['dimension'])
 
 ### group_by
 
-Sets the dimensions to group the data.
+https://github.com/metamx/druid/wiki/GroupByQuery - Sets the dimensions to group the data.
 
 `queryType` is set automatically to `groupBy`.
 
 
 ```ruby
 Druid::Query.new('service/source').group_by([:dimension1, :dimension2])
+```
+
+### time_series
+
+https://github.com/metamx/druid/wiki/TimeseriesQuery - return an array of JSON objects where each object represents a value asked for by the timeseries query
+
+```ruby
+Druid::Query.new('service/source').time_series([:aggregate1, :aggregate2])
 ```
 
 ### long_sum
