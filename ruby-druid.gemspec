@@ -2,12 +2,12 @@ require 'rake'
 
 Gem::Specification.new do |gem|
   gem.name          = 'ruby-druid'
-  gem.version       = '0.1.0'
+  gem.version       = '0.1.1'
   gem.date          = '2013-08-01'
   gem.summary       = 'Ruby client for druid'
   gem.description   = 'Ruby client for metamx druid'
-  gem.authors       = 'The madvertise team'
-  gem.email         = 'tech@madvertise.de'
+  gem.authors       = 'The LiquidM Team'
+  gem.email         = 'tech@liquidm.com'
   gem.homepage      = 'https://github.com/madvertise/ruby-druid'
 
   gem.files         = `git ls-files`.split("\n")
