@@ -3,7 +3,7 @@ require 'ap'
 require 'forwardable'
 require 'irb'
 require 'ripl'
-require 'terminal-table'
+require 'terminal-table/import'
 
 require 'druid'
 
@@ -13,11 +13,19 @@ Ripl::Shell.class_eval do
     include_timestamp = query.properties[:granularity] != 'all'
 
     keys = result.empty? ? [] : result.last.keys
+    grouped_rows = result.group_by(&:timestamp)
 
-    Terminal::Table.new({
-      headings: (include_timestamp ? ["timestamp"] : []) + keys,
-      rows: result.map { |row| (include_timestamp ? [row.timestamp] : []) + row.values }
-    })
+    table do
+      self.headings = keys
+      grouped_rows.each do |timestamp, rows|
+        if include_timestamp
+          add_row :separator unless timestamp == result.first.timestamp
+          add_row [{ :value => timestamp, :colspan => keys.length }]
+          add_row :separator
+        end
+        rows.each {|row| add_row keys.map {|key| row[key] } }
+      end
+    end
   end
 
   def format_result(result)
