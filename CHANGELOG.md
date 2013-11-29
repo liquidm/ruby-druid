@@ -1,3 +1,9 @@
+### 0.1.3
+
+* dripl improvements
+  * Fixed badly formatted output for rows with missing values
+  * Changed display of responses where granularity is set
+
 ### 0.1.1
 
 * Zookeeper connection issues

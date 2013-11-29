@@ -9,15 +9,14 @@ require 'druid'
 
 Ripl::Shell.class_eval do
   def format_query_result(result, query)
-
     include_timestamp = query.properties[:granularity] != 'all'
 
     keys = result.empty? ? [] : result.last.keys
-    grouped_rows = result.group_by(&:timestamp)
+    grouped_result = result.group_by(&:timestamp)
 
     table do
       self.headings = keys
-      grouped_rows.each do |timestamp, rows|
+      grouped_result.each do |timestamp, rows|
         if include_timestamp
           add_row :separator unless timestamp == result.first.timestamp
           add_row [{ :value => timestamp, :colspan => keys.length }]
