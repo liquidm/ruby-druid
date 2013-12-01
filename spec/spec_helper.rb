@@ -1,2 +1,2 @@
-require "druid"
+require 'druid'
 require 'webmock/rspec'
