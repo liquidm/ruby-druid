@@ -15,6 +15,10 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "zk"
+  spec.add_dependency "liquid-ext"
+  spec.add_dependency "parslet"
   spec.add_dependency "rest-client"
+  spec.add_dependency "ripl"
+  spec.add_dependency "terminal-table"
+  spec.add_dependency "zk"
 end

@@ -4,7 +4,6 @@ module Druid
 
     def initialize(zookeeper_uri, opts = nil)
       opts ||= {}
-
       if opts[:static_setup] && !opts[:fallback]
         @static = opts[:static_setup]
       else
@@ -13,11 +12,13 @@ module Druid
       end
     end
 
-    def send(query)
-      uri = data_source_uri(query.source)
-      raise "data source #{query.source} (currently) not available" unless uri
+    def submit(query)
+      uri = data_source_uri(query[:dataSource])
+      raise "data source #{query[:dataSource]} (currently) not available" unless uri
 
-      req = Net::HTTP::Post.new(uri.path, {'Content-Type' =>'application/json'})
+      req = Net::HTTP::Post.new(uri.path, {
+        'Content-Type' =>'application/json'
+      })
       req.body = query.to_json
 
       response = Net::HTTP.new(uri.host, uri.port).start do |http|
@@ -25,28 +26,23 @@ module Druid
         http.request(req)
       end
 
-      if response.code == "200"
-        JSON.parse(response.body).map{ |row| ResponseRow.new(row) }
-      else
+      if response.code != "200"
         raise "Request failed: #{response.code}: #{response.body}"
       end
-    end
 
-    def query(id, &block)
-      uri = data_source_uri(id)
-      raise "data source #{id} (currently) not available" unless uri
-      query = Query.new(id, self)
-      return query unless block
-
-      send query
+      JSON.parse(response.body).map do |row|
+        event = Hash[row['event'].reject do |k, v|
+          k =~ /^__/
+        end]
+        { timestamp: row['timestamp'] }.merge(event)
+      end
     end
 
     def zookeeper_caching_management!(zookeeper_uri, opts)
       @zk = ZooHandler.new(zookeeper_uri, opts)
-
+      return unless @zk
       unless opts[:zk_keepalive]
-        @cached_data_sources = @zk.data_sources unless @zk.nil?
-
+        @cached_data_sources = @zk.data_sources
         @zk.close!
       end
     end
@@ -60,11 +56,12 @@ module Druid
     end
 
     def data_source_uri(source)
+      source = "madvertise/#{source}"
       uri = (ds.nil? ? @static : ds)[source]
       begin
         return URI(uri) if uri
       rescue
-         return URI(@backup) if @backup
+        return URI(@backup) if @backup
       end
     end
 

@@ -9,14 +9,12 @@ module Druid
 
     attr_reader :properties
 
-    def initialize(source, client = nil)
+    def initialize(source)
       @properties = {}
-      @client = client
 
       # set some defaults
       data_source(source)
       granularity(:all)
-
       interval(today)
     end
 
@@ -24,15 +22,11 @@ module Druid
       Time.now.to_date.to_time
     end
 
-    def send
-      @client.send(self)
-    end
-
     def query_type(type)
       @properties[:queryType] = type
       self
     end
-    
+
     def get_query_type()
       @properties[:queryType] || :groupBy
     end
@@ -53,7 +47,7 @@ module Druid
       @properties[:dimensions] = dimensions.flatten
       self
     end
-    
+
     def time_series(*aggregations)
       query_type(:timeseries)
       #@properties[:aggregations] = aggregations.flatten
