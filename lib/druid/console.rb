@@ -3,7 +3,7 @@ require 'ap'
 require 'forwardable'
 require 'irb'
 require 'ripl'
-require 'terminal-table/import'
+require 'terminal-table'
 
 require 'druid'
 
@@ -14,8 +14,7 @@ Ripl::Shell.class_eval do
     keys = result.empty? ? [] : result.last.keys
     grouped_result = result.group_by(&:timestamp)
 
-    table do
-      self.headings = keys
+    Terminal::Table.new(:headings => keys) do
       grouped_result.each do |timestamp, rows|
         if include_timestamp
           add_row :separator unless timestamp == result.first.timestamp
