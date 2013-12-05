@@ -9,15 +9,21 @@ require 'druid'
 
 Ripl::Shell.class_eval do
   def format_query_result(result, query)
-
     include_timestamp = query.properties[:granularity] != 'all'
 
     keys = result.empty? ? [] : result.last.keys
+    grouped_result = result.group_by(&:timestamp)
 
-    Terminal::Table.new({
-      headings: (include_timestamp ? ["timestamp"] : []) + keys,
-      rows: result.map { |row| (include_timestamp ? [row.timestamp] : []) + row.values }
-    })
+    Terminal::Table.new(:headings => keys) do
+      grouped_result.each do |timestamp, rows|
+        if include_timestamp
+          add_row :separator unless timestamp == result.first.timestamp
+          add_row [{ :value => timestamp, :colspan => keys.length }]
+          add_row :separator
+        end
+        rows.each {|row| add_row keys.map {|key| row[key] } }
+      end
+    end
   end
 
   def format_result(result)
