@@ -8,7 +8,7 @@ module Druid
     def initialize(uri, opts = {})
       @zk = ZK.new uri, :chroot => :check
       @registry = Hash.new {|hash,key| hash[key] = Array.new }
-      @discovery_path = opts[:discovery_path] || '/discoveryPath'
+      @discovery_path = opts[:discovery_path] || '/discovery'
       @watched_services = Hash.new
 
       init_zookeeper
