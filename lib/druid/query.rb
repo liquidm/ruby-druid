@@ -174,11 +174,8 @@ module Druid
     end
 
     def contains_aggregation?(metric)
-      @properties[:aggregations].each do |aggregation|
-        return true if aggregation[:fieldName] == metric.to_s
-      end if @properties[:aggregations]
-
-      false
+      return false if @properties[:aggregations].nil?
+      @properties[:aggregations].index { |aggregation| aggregation[:fieldName] == metric.to_s }
     end
   end
 
