@@ -74,7 +74,7 @@ module Druid
             :type => agg_type,
             :name => metric.to_s,
             :fieldName => metric.to_s
-          } unless contains_aggregation(metric)
+          } unless contains_aggregation?(metric)
         end
 
         self
@@ -173,7 +173,7 @@ module Druid
       "#{from.iso8601}/#{to.iso8601}"
     end
 
-    def contains_aggregation(metric)
+    def contains_aggregation?(metric)
       @properties[:aggregations].each do |aggregation|
         return true if aggregation[:fieldName] == metric.to_s
       end if @properties[:aggregations]
