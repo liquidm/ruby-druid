@@ -67,15 +67,16 @@ module Druid
 
       define_method method_name do |*metrics|
         query_type(get_query_type())
-        aggregations = @properties[:aggregations] || []
-        aggregations.concat(metrics.flatten.map{ |metric|
-          {
+        @properties[:aggregations] = [] if @properties[:aggregations].nil?
+
+        metrics.flatten.each do |metric|
+          @properties[:aggregations] << {
             :type => agg_type,
             :name => metric.to_s,
             :fieldName => metric.to_s
-          }
-        }).uniq!
-        @properties[:aggregations] = aggregations
+          } unless contains_aggregation?(metric)
+        end
+
         self
       end
     end
@@ -171,5 +172,11 @@ module Druid
       to = DateTime.parse(to.to_s) unless to.respond_to? :iso8601
       "#{from.iso8601}/#{to.iso8601}"
     end
+
+    def contains_aggregation?(metric)
+      return false if @properties[:aggregations].nil?
+      @properties[:aggregations].index { |aggregation| aggregation[:fieldName] == metric.to_s }
+    end
   end
+
 end
