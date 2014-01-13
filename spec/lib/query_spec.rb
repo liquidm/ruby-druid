@@ -32,10 +32,10 @@ describe Druid::Query do
   end
 
   it 'takes dimension, metric and threshold from topn method' do
-    @query.topn(:dim, :metric, 25)
+    @query.topn(:a, :b, 25)
     result = JSON.parse(@query.to_json)
-    result['dimension'].should == 'dim'
-    result['metric'].should == 'metric'
+    result['dimension'].should == 'a'
+    result['metric'].should == 'b'
     result['threshold'].should == 25
   end
 
