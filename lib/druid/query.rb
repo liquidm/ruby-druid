@@ -53,6 +53,14 @@ module Druid
       @properties[:dimensions] = dimensions.flatten
       self
     end
+
+    def topn(dimension, metric, threshold)
+      query_type(:topN)
+      @properties[:dimension] = dimension
+      @properties[:metric] = metric
+      @properties[:threshold] = threshold
+      self
+    end
     
     def time_series(*aggregations)
       query_type(:timeseries)
