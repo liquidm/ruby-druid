@@ -31,6 +31,14 @@ describe Druid::Query do
     JSON.parse(@query.to_json)['dimensions'].should == ['a', 'b', 'c']
   end
 
+  it 'takes dimension, metric and threshold from topn method' do
+    @query.topn(:dim, :metric, 25)
+    result = JSON.parse(@query.to_json)
+    result['dimension'].should == 'dim'
+    result['metric'].should == 'metric'
+    result['threshold'].should == 25
+  end
+
   it 'build a post aggregation with a constant right' do
     @query.postagg{(a + 1).as ctr }
 
