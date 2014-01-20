@@ -79,6 +79,8 @@ module Druid
               :open_timeout => 5
             })
 
+            puts "#{check_uri} -> #{check.code}"
+
             if check.code == 200
               new_list.push({
                 :name => name,
@@ -86,8 +88,10 @@ module Druid
                 :data_sources => JSON.parse(check.to_str)
               })
             else
+              puts "Broker #{uri} seems down"
             end
           rescue
+            puts "Skipping #{node}"
           end
         end
 

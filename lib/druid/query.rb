@@ -68,6 +68,20 @@ module Druid
       self
     end
 
+    def sample(*metrics)
+      query_type(get_query_type())
+      @properties[:aggregations] = [] if @properties[:aggregations].nil?
+      metrics.flatten.each do |metric|
+        @properties[:aggregations] << {
+          :type => :sample,
+          :name => metric.to_s,
+          :fieldName => metric.to_s
+        } unless contains_aggregation?(metric)
+      end
+
+      self
+    end
+
     [:long_sum, :double_sum].each do |method_name|
       agg_type = method_name.to_s.split('_')
       agg_type[1].capitalize!
