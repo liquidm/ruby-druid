@@ -192,6 +192,17 @@ This filter creates a set of equals filters in an and filter.
 ```ruby
 Druid::Query.new('service/source').filter{dimension.in(1,2,3)}
 ```
+#### Geographic filter
+
+These filters have to be combined with time_series and do only work when coordinates is a spatial dimension [GeographicQueries](http://druid.io/docs/0.6.73/GeographicQueries.html)
+
+```ruby
+Druid::Query.new('service/source').time_series().long_sum([:aggregate1]).filter{coordinates.in_rec [[50.0,13.0],[54.0,15.0]]}
+```
+
+```ruby
+Druid::Query.new('service/source').time_series().long_sum([:aggregate1]).filter{coordinates.in_circ [[53.0,13.0], 5.0]}
+```
 
 #### Hash syntax
 
