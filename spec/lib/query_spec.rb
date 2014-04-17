@@ -207,6 +207,32 @@ describe Druid::Query do
     }
   end
 
+  it 'creates a in_circ filter' do
+    @query.filter{a.in_circ [[52.0,13.0], 10.0]}
+    JSON.parse(@query.to_json)['filter'].should == {
+    "type" => "spatial",
+    "dimension" => "a",
+    "bound" => {
+        "type" => "radius",
+        "coords" => [52.0, 13.0],
+        "radius" =>  10.0
+      }
+    }
+  end
+
+  it 'creates a in_rec filter' do
+    @query.filter{a.in_rec [[10.0, 20.0], [30.0, 40.0]] }
+    JSON.parse(@query.to_json)['filter'].should == {
+    "type" => "spatial",
+    "dimension" => "a",
+    "bound" => {
+        "type" => "rectangular",
+        "minCoords" => [10.0, 20.0],
+        "maxCoords" => [30.0, 40.0]
+      }
+    }
+  end
+
   it 'creates an equals filter' do
     @query.filter{a.eq 1}
     JSON.parse(@query.to_json)['filter'].should == {"type"=>"selector", "dimension"=>"a", "value"=>1}

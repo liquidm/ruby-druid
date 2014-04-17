@@ -38,6 +38,14 @@ module Druid
       @regexp = nil
     end
 
+    def in_rec(bounds)
+      RecFilter.new(@name, bounds)
+    end 
+
+    def in_circ(bounds)
+      CircFilter.new(@name, bounds)
+    end 
+
     def eq(value)
       return self.in(value) if value.is_a? Array
       return self.regexp(value) if value.is_a? Regexp
@@ -192,6 +200,46 @@ module Druid
         result[:field] = @elements[0].to_hash
       end
       result
+    end
+  end
+  
+  class RecFilter < FilterDimension
+
+    def initialize(dimension, bounds)
+      @dimension = dimension
+      @bounds = bounds
+    end 
+
+    def to_hash
+      {
+      :type => "spatial",
+      :dimension => @dimension,
+      :bound =>{
+        :type => "rectangular",
+        :minCoords => @bounds.first,
+        :maxCoords => @bounds.last
+        }
+      }
+    end
+  end
+
+  class CircFilter < FilterDimension
+
+    def initialize(dimension, bounds)
+      @dimension = dimension
+      @bounds = bounds
+    end 
+
+    def to_hash
+      {
+      :type => "spatial",
+      :dimension => @dimension,
+      :bound =>{
+        :type => "radius",
+        :coords => @bounds.first,
+        :radius => @bounds.last
+        }
+      }
     end
   end
 
