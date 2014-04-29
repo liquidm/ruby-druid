@@ -68,9 +68,9 @@ module Druid
       self
     end
 
-    [:long_sum, :double_sum].each do |method_name|
+    [:long_sum, :double_sum, :count].each do |method_name|
       agg_type = method_name.to_s.split('_')
-      agg_type[1].capitalize!
+      agg_type[1].capitalize! if agg_type.length > 1
       agg_type = agg_type.join
 
       define_method method_name do |*metrics|
