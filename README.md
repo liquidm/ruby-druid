@@ -187,10 +187,18 @@ Druid::Query.new('service/source').filter{!dimension.eq(1)}
 
 #### Inclusion Filter
 
-This filter creates a set of equals filters in an and filter.
+This filter creates a set of equals filters in an or filter.
 
 ```ruby
 Druid::Query.new('service/source').filter{dimension.in(1,2,3)}
+```
+
+#### Exclusion Filter
+
+This filter creates a set of not-equals fitlers in an and filter.
+
+```ruby
+Druid::Query.new('service/source').filter{dimension.nin(1,2,3)}
 ```
 
 #### Hash syntax
