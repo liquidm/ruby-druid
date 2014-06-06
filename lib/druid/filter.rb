@@ -1,7 +1,7 @@
 module Druid
   class Filter
     (instance_methods + private_instance_methods).each do |method|
-      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect)/ || method.to_s =~ /\?/
+      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect|send)/ || method.to_s =~ /\?/
         undef_method method
       end
     end
@@ -13,7 +13,7 @@ module Druid
 
   class FilterParameter
     (instance_methods + private_instance_methods).each do |method|
-      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect|class)/ || method.to_s =~ /\?/
+      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect|class|send)/ || method.to_s =~ /\?/
         undef_method method
       end
     end
@@ -55,7 +55,6 @@ module Druid
 
     alias :'==' :eq
 
-
     def neq(value)
       return !self.in(value)
     end
@@ -64,20 +63,12 @@ module Druid
 
     def in(*args)
       values = args.flatten
-      raise "Must provide non-empty array in in()" if values.empty?
+      filter_multiple(values, 'or', :eq)
+    end
 
-      if (values.length == 1)
-        return self.eq(values[0])
-      end
-
-      filter_or = FilterOperator.new('or', true)
-      values.each do |value|
-        raise "query is too complex" if value.is_a? FilterParameter
-        param = FilterDimension.new(@name)
-        param.eq value
-        filter_or.add param
-      end
-      filter_or
+    def nin(*args)
+      values = args.flatten
+      filter_multiple(values, 'and', :neq)
     end
 
     def &(other)
@@ -144,6 +135,20 @@ module Druid
         hash['pattern'] = @regexp
       end
       hash
+    end
+
+    private
+
+    def filter_multiple(values, operator, method)
+      raise 'Values cannot be empty' if values.empty?
+      return self.send(method, values[0]) if values.length == 1
+
+      filter = FilterOperator.new(operator, true)
+      values.each do |value|
+        raise 'Value cannot be a parameter' if value.is_a?(FilterParameter)
+        filter.add(FilterDimension.new(@name).send(method, value))
+      end
+      filter
     end
   end
 

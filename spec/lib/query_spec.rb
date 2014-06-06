@@ -315,6 +315,16 @@ end
     "type" => "or"}
   end
 
+  it 'creates a nin statement with and filter' do
+    @query.filter{a.nin [1,2,3]}
+    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
+      {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>1},"type" => "not"},
+      {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>2},"type" => "not"},
+      {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>3},"type" => "not"}
+    ],
+    "type" => "and"}
+  end
+
   it 'creates a javascript with > filter' do
     @query.filter{a > 100}
     JSON.parse(@query.to_json)['filter'].should == {
@@ -366,7 +376,7 @@ end
   end
 
   it 'does not accept in with empty array' do
-    expect { @query.filter{a.in []} }.to raise_error "Must provide non-empty array in in()"
+    expect { @query.filter{a.in []} }.to raise_error "Values cannot be empty"
   end
 
   it 'does raise on invalid filter statement' do
