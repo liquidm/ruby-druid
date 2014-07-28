@@ -418,4 +418,16 @@ end
     }
   end
 
+  it 'takes type, limit and columns from limit method' do
+    @query.limit_spec(10, :a => 'ASCENDING', :b => 'DESCENDING')
+    result = JSON.parse(@query.to_json)
+    result['limitSpec'].should == {
+      'type' => 'default',
+      'limit' => 10,
+      'columns' => [
+        { 'dimension' => 'a', 'direction' => 'ASCENDING'},
+        { 'dimension' => 'b', 'direction' => 'DESCENDING'}
+      ]
+    }
+  end
 end
