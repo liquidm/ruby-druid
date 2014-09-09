@@ -1,6 +1,5 @@
 module Druid
   class Client
-    TIMEOUT = 2 * 60
 
     def initialize(zookeeper_uri, opts = nil)
       opts ||= {}
@@ -11,6 +10,8 @@ module Druid
         @backup = opts[:static_setup] if opts[:fallback]
         zookeeper_caching_management!(zookeeper_uri, opts)
       end
+
+      @http_timeout = opts[:http_timeout] || 2 * 60
     end
 
     def send(query)
@@ -21,7 +22,7 @@ module Druid
       req.body = query.to_json
 
       response = Net::HTTP.new(uri.host, uri.port).start do |http|
-        http.read_timeout = TIMEOUT
+        http.read_timeout = @http_timeout
         http.request(req)
       end
 
@@ -77,7 +78,7 @@ module Druid
       req = Net::HTTP::Get.new(meta_path)
 
       response = Net::HTTP.new(uri.host, uri.port).start do |http|
-        http.read_timeout = TIMEOUT
+        http.read_timeout = @http_timeout
         http.request(req)
       end
 
