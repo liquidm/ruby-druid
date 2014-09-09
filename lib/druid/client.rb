@@ -1,6 +1,6 @@
 module Druid
   class Client
-    TIMEOUT = 2 * 60 * 1000
+    TIMEOUT = 2 * 60
 
     def initialize(zookeeper_uri, opts = nil)
       opts ||= {}
