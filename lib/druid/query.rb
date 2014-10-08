@@ -32,7 +32,7 @@ module Druid
       @properties[:queryType] = type
       self
     end
-    
+
     def get_query_type()
       @properties[:queryType] || :groupBy
     end
@@ -61,7 +61,7 @@ module Druid
       @properties[:threshold] = threshold
       self
     end
-    
+
     def time_series(*aggregations)
       query_type(:timeseries)
       #@properties[:aggregations] = aggregations.flatten
@@ -103,6 +103,17 @@ module Druid
       sum_method.call(post_agg.get_field_names)
 
       self
+    end
+
+    def javascript_postagg(name, fields, function)
+      @properties[:postAggregations] ||= []
+
+      @properties[:postAggregations] << {
+          type: "javascript",
+          name: name,
+          fieldNames: [fields].flatten,
+          function: function
+        }
     end
 
     def postagg_double(&block)
@@ -177,7 +188,7 @@ module Druid
         :columns => order_by_column_spec(columns)
       }
       self
-    end 
+    end
 
     private
 
