@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Druid::Client do
 
   it 'calls zookeeper on intialize' do

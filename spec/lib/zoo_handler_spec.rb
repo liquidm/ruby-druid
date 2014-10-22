@@ -1,5 +1,3 @@
-require "spec_helper"
-
 module ZK
   def self.new(uri, opts = {})
     Mock.new uri, opts
