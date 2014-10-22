@@ -170,7 +170,25 @@ module Druid
       @properties.to_json
     end
 
+   def limit_spec(limit, columns)
+      @properties[:limitSpec] = {
+        :type => :default,
+        :limit => limit,
+        :columns => order_by_column_spec(columns)
+      }
+      self
+    end 
+
     private
+
+    def order_by_column_spec(columns)
+      columns.map do |dimension, direction|
+        {
+          :dimension => dimension,
+          :direction => direction
+        }
+      end
+    end
 
     def mk_interval(from, to)
       from = today + from if from.is_a?(Fixnum)
