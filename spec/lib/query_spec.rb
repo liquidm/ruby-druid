@@ -396,12 +396,13 @@ end
     end
 
     it 'chains having clauses with and' do
-      @query.having{a > 100}.having{b > 200}
+      @query.having{a > 100}.having{b > 200}.having{c > 300}
       JSON.parse(@query.to_json)['having'].should == {
         "type" => "and",
         "havingSpecs" => [
           { "type" => "greaterThan", "aggregation" => "a", "value" => 100 },
-          { "type" => "greaterThan", "aggregation" => "b", "value" => 200 }
+          { "type" => "greaterThan", "aggregation" => "b", "value" => 200 },
+          { "type" => "greaterThan", "aggregation" => "c", "value" => 300 }
         ]
       }
     end
