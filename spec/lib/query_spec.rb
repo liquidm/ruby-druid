@@ -387,11 +387,24 @@ end
     ]}
   end
 
-  it 'creates a greater than having clause' do
-    @query.having{a > 100}
-    JSON.parse(@query.to_json)['having'].should == {
-      "type"=>"greaterThan", "aggregation"=>"a", "value"=>100
-    }
+  describe '#having' do
+    it 'creates a greater than having clause' do
+      @query.having{a > 100}
+      JSON.parse(@query.to_json)['having'].should == {
+        "type"=>"greaterThan", "aggregation"=>"a", "value"=>100
+      }
+    end
+
+    it 'chains having clauses with and' do
+      @query.having{a > 100}.having{b > 200}
+      JSON.parse(@query.to_json)['having'].should == {
+        "type" => "and",
+        "havingSpecs" => [
+          { "type" => "greaterThan", "aggregation" => "a", "value" => 100 },
+          { "type" => "greaterThan", "aggregation" => "b", "value" => 200 }
+        ]
+      }
+    end
   end
 
   it 'does not accept in with empty array' do

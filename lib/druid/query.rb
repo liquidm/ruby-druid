@@ -1,6 +1,8 @@
+require 'druid/serializable'
 require 'druid/filter'
 require 'druid/having'
 require 'druid/post_aggregation'
+
 require 'time'
 require 'json'
 
@@ -137,7 +139,16 @@ module Druid
 
     def having(&block)
       having = Having.new.instance_exec(&block)
-      @properties[:having] = having
+
+      if old_having = @properties[:having]
+        new_having = HavingOperator.new('and')
+        new_having.add(old_having)
+        new_having.add(having)
+      else
+        new_having = having
+      end
+
+      @properties[:having] = new_having
       self
     end
 
