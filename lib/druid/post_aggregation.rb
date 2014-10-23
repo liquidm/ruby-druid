@@ -121,6 +121,7 @@ module Druid
 
   class PostAggregationJavascript
     include PostAggregationOperators
+    include Serializable
 
     def initialize(function)
       @field_names = extract_fields(function)
@@ -143,14 +144,6 @@ module Druid
         "fieldNames" => @field_names,
         "function" => @function
       }
-    end
-
-    def to_json(*a)
-      to_hash.to_json(*a)
-    end
-
-    def as_json(*a)
-      to_hash
     end
 
     private
