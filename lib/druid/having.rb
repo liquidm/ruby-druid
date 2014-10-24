@@ -8,12 +8,6 @@ module Druid
   end
 
   class HavingFilter
-    (instance_methods + private_instance_methods).each do |method|
-      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect|class)/ || method.to_s =~ /\?/
-        undef_method method
-      end
-    end
-
     include Serializable
 
     def clause?
