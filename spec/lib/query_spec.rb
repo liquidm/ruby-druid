@@ -226,165 +226,181 @@ describe Druid::Query do
     }
   end
 
-  it 'creates a in_circ filter' do
-    @query.filter{a.in_circ [[52.0,13.0], 10.0]}
-    JSON.parse(@query.to_json)['filter'].should == {
-    "type" => "spatial",
-    "dimension" => "a",
-    "bound" => {
-        "type" => "radius",
-        "coords" => [52.0, 13.0],
-        "radius" =>  10.0
-      }
-    }
-  end
-
-  it 'creates a in_rec filter' do
-    @query.filter{a.in_rec [[10.0, 20.0], [30.0, 40.0]] }
-    JSON.parse(@query.to_json)['filter'].should == {
-    "type" => "spatial",
-    "dimension" => "a",
-    "bound" => {
-        "type" => "rectangular",
-        "minCoords" => [10.0, 20.0],
-        "maxCoords" => [30.0, 40.0]
-      }
-    }
-  end
-
-  it 'creates an equals filter' do
-    @query.filter{a.eq 1}
-    JSON.parse(@query.to_json)['filter'].should == {"type"=>"selector", "dimension"=>"a", "value"=>1}
-  end
-
-  it 'creates an equals filter with ==' do
-    @query.filter{a == 1}
-    JSON.parse(@query.to_json)['filter'].should == {"type"=>"selector", "dimension"=>"a", "value"=>1}
-  end
-
-
-  it 'creates a not filter' do
-    @query.filter{!a.eq 1}
-    JSON.parse(@query.to_json)['filter'].should ==  {"field" =>
-      {"type"=>"selector", "dimension"=>"a", "value"=>1},
-    "type" => "not"}
-  end
-
-  it 'creates a not filter with neq' do
-    @query.filter{a.neq 1}
-    JSON.parse(@query.to_json)['filter'].should ==  {"field" =>
-      {"type"=>"selector", "dimension"=>"a", "value"=>1},
-    "type" => "not"}
-  end
-
-  it 'creates a not filter with !=' do
-    @query.filter{a != 1}
-    JSON.parse(@query.to_json)['filter'].should ==  {"field" =>
-      {"type"=>"selector", "dimension"=>"a", "value"=>1},
-    "type" => "not"}
-  end
-
-
-  it 'creates an and filter' do
-    @query.filter{a.neq(1) & b.eq(2) & c.eq('foo')}
-    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
-      {"type"=>"not", "field"=>{"type"=>"selector", "dimension"=>"a", "value"=>1}},
-      {"type"=>"selector", "dimension"=>"b", "value"=>2},
-      {"type"=>"selector", "dimension"=>"c", "value"=>"foo"}
-    ],
-  "type" => "and"}
-end
-
-  it 'creates an or filter' do
-    @query.filter{a.neq(1) | b.eq(2) | c.eq('foo')}
-    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
-      {"type"=>"not", "field"=> {"type"=>"selector", "dimension"=>"a", "value"=>1}},
-      {"type"=>"selector", "dimension"=>"b", "value"=>2},
-      {"type"=>"selector", "dimension"=>"c", "value"=>"foo"}
-    ],
-  "type" => "or"}
-  end
-
-  it 'chains filters' do
-    @query.filter{a.eq(1)}.filter{b.eq(2)}
-    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
-      {"type"=>"selector", "dimension"=>"a", "value"=>1},
-      {"type"=>"selector", "dimension"=>"b", "value"=>2}
-    ],
-    "type" => "and"}
-  end
-
-  it 'creates filter from hash' do
-    @query.filter a:1, b:2
-    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
-      {"type"=>"selector", "dimension"=>"a", "value"=>1},
-      {"type"=>"selector", "dimension"=>"b", "value"=>2}
-    ],
-    "type" => "and"}
-
-  end
-
-  it 'creates an in statement with or filter' do
-    @query.filter{a.in [1,2,3]}
-    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
-      {"type"=>"selector", "dimension"=>"a", "value"=>1},
-      {"type"=>"selector", "dimension"=>"a", "value"=>2},
-      {"type"=>"selector", "dimension"=>"a", "value"=>3}
-    ],
-    "type" => "or"}
-  end
-
-  it 'creates a nin statement with and filter' do
-    @query.filter{a.nin [1,2,3]}
-    JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
-      {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>1},"type" => "not"},
-      {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>2},"type" => "not"},
-      {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>3},"type" => "not"}
-    ],
-    "type" => "and"}
-  end
-
-  it 'creates a javascript with > filter' do
-    @query.filter{a > 100}
-    JSON.parse(@query.to_json)['filter'].should == {
-      "type" => "javascript",
+  describe '#filter' do
+    it 'creates a in_circ filter' do
+      @query.filter{a.in_circ [[52.0,13.0], 10.0]}
+      JSON.parse(@query.to_json)['filter'].should == {
+      "type" => "spatial",
       "dimension" => "a",
-      "function" => "function(a) { return(a > 100); }"
-    }
-  end
+      "bound" => {
+          "type" => "radius",
+          "coords" => [52.0, 13.0],
+          "radius" =>  10.0
+        }
+      }
+    end
 
-  it 'creates a mixed javascript filter' do
-    @query.filter{(a >= 128) & (a != 256)}
-    JSON.parse(@query.to_json)['filter'].should == {"fields" => [
-      {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 128); }"},
-      {"field" => {"type" => "selector", "dimension" => "a", "value" => 256}, "type" => "not"}
-    ],
-    "type" => "and"}
-  end
+    it 'creates a in_rec filter' do
+      @query.filter{a.in_rec [[10.0, 20.0], [30.0, 40.0]] }
+      JSON.parse(@query.to_json)['filter'].should == {
+      "type" => "spatial",
+      "dimension" => "a",
+      "bound" => {
+          "type" => "rectangular",
+          "minCoords" => [10.0, 20.0],
+          "maxCoords" => [30.0, 40.0]
+        }
+      }
+    end
 
-  it 'creates a complex javascript filter' do
-    @query.filter{(a >= 4) & (a <= '128')}
-    JSON.parse(@query.to_json)['filter'].should == {"fields" => [
-      {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 4); }"},
-      {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a <= '128'); }"}
-    ],
-    "type" => "and"}
-  end
+    it 'creates an equals filter' do
+      @query.filter{a.eq 1}
+      JSON.parse(@query.to_json)['filter'].should == {"type"=>"selector", "dimension"=>"a", "value"=>1}
+    end
 
-  it 'can chain two in statements' do
-    @query.filter{a.in([1,2,3]) & b.in([1,2,3])}
-    JSON.parse(@query.to_json)['filter'].should == {"type"=>"and", "fields"=>[
-      {"type"=>"or", "fields"=>[
+    it 'creates an equals filter with ==' do
+      @query.filter{a == 1}
+      JSON.parse(@query.to_json)['filter'].should == {"type"=>"selector", "dimension"=>"a", "value"=>1}
+    end
+
+    it 'creates a not filter' do
+      @query.filter{!a.eq 1}
+      JSON.parse(@query.to_json)['filter'].should ==  {"field" =>
+        {"type"=>"selector", "dimension"=>"a", "value"=>1},
+      "type" => "not"}
+    end
+
+    it 'creates a not filter with neq' do
+      @query.filter{a.neq 1}
+      JSON.parse(@query.to_json)['filter'].should ==  {"field" =>
+        {"type"=>"selector", "dimension"=>"a", "value"=>1},
+      "type" => "not"}
+    end
+
+    it 'creates a not filter with !=' do
+      @query.filter{a != 1}
+      JSON.parse(@query.to_json)['filter'].should ==  {"field" =>
+        {"type"=>"selector", "dimension"=>"a", "value"=>1},
+      "type" => "not"}
+    end
+
+    it 'creates an and filter' do
+      @query.filter{a.neq(1) & b.eq(2) & c.eq('foo')}
+      JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
+        {"type"=>"not", "field"=>{"type"=>"selector", "dimension"=>"a", "value"=>1}},
+        {"type"=>"selector", "dimension"=>"b", "value"=>2},
+        {"type"=>"selector", "dimension"=>"c", "value"=>"foo"}
+      ],
+      "type" => "and"}
+    end
+
+    it 'creates an or filter' do
+      @query.filter{a.neq(1) | b.eq(2) | c.eq('foo')}
+      JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
+        {"type"=>"not", "field"=> {"type"=>"selector", "dimension"=>"a", "value"=>1}},
+        {"type"=>"selector", "dimension"=>"b", "value"=>2},
+        {"type"=>"selector", "dimension"=>"c", "value"=>"foo"}
+      ],
+      "type" => "or"}
+    end
+
+    it 'chains filters' do
+      @query.filter{a.eq(1)}.filter{b.eq(2)}
+      JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
+        {"type"=>"selector", "dimension"=>"a", "value"=>1},
+        {"type"=>"selector", "dimension"=>"b", "value"=>2}
+      ],
+      "type" => "and"}
+    end
+
+    it 'creates filter from hash' do
+      @query.filter a:1, b:2
+      JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
+        {"type"=>"selector", "dimension"=>"a", "value"=>1},
+        {"type"=>"selector", "dimension"=>"b", "value"=>2}
+      ],
+      "type" => "and"}
+    end
+
+    context 'when type argument is :nin' do
+      it 'creates nin filter from hash' do
+        @query.filter({ a: 1, b: 2 }, :nin)
+        expect(JSON.parse(@query.to_json)['filter']).to eq({'fields' => [
+          {'type' => 'not', 'field' => { 'dimension' => 'a', 'type' => 'selector', 'value' => 1} },
+          {'type' => 'not', 'field' => { 'dimension' => 'b', 'type' => 'selector', 'value' => 2} }
+        ],
+        'type' => 'and'})
+      end
+    end
+
+    context 'when type argument is invalid' do
+      it 'raises an error' do
+        expect { @query.filter({ a: 1 }, :invalid_type) }.to raise_error
+      end
+    end
+
+    it 'creates an in statement with or filter' do
+      @query.filter{a.in [1,2,3]}
+      JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
         {"type"=>"selector", "dimension"=>"a", "value"=>1},
         {"type"=>"selector", "dimension"=>"a", "value"=>2},
         {"type"=>"selector", "dimension"=>"a", "value"=>3}
-      ]},
-      {"type"=>"or", "fields"=>[
-        {"type"=>"selector", "dimension"=>"b", "value"=>1},
-        {"type"=>"selector", "dimension"=>"b", "value"=>2},
-        {"type"=>"selector", "dimension"=>"b", "value"=>3}
+      ],
+      "type" => "or"}
+    end
+
+    it 'creates a nin statement with and filter' do
+      @query.filter{a.nin [1,2,3]}
+      JSON.parse(@query.to_json)['filter'].should ==  {"fields" => [
+        {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>1},"type" => "not"},
+        {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>2},"type" => "not"},
+        {"field"=>{"type"=>"selector", "dimension"=>"a", "value"=>3},"type" => "not"}
+      ],
+      "type" => "and"}
+    end
+
+    it 'creates a javascript with > filter' do
+      @query.filter{a > 100}
+      JSON.parse(@query.to_json)['filter'].should == {
+        "type" => "javascript",
+        "dimension" => "a",
+        "function" => "function(a) { return(a > 100); }"
+      }
+    end
+
+    it 'creates a mixed javascript filter' do
+      @query.filter{(a >= 128) & (a != 256)}
+      JSON.parse(@query.to_json)['filter'].should == {"fields" => [
+        {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 128); }"},
+        {"field" => {"type" => "selector", "dimension" => "a", "value" => 256}, "type" => "not"}
+      ],
+      "type" => "and"}
+    end
+
+    it 'creates a complex javascript filter' do
+      @query.filter{(a >= 4) & (a <= '128')}
+      JSON.parse(@query.to_json)['filter'].should == {"fields" => [
+        {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a >= 4); }"},
+        {"type" => "javascript", "dimension" => "a", "function" => "function(a) { return(a <= '128'); }"}
+      ],
+      "type" => "and"}
+    end
+
+    it 'can chain two in statements' do
+      @query.filter{a.in([1,2,3]) & b.in([1,2,3])}
+      JSON.parse(@query.to_json)['filter'].should == {"type"=>"and", "fields"=>[
+        {"type"=>"or", "fields"=>[
+          {"type"=>"selector", "dimension"=>"a", "value"=>1},
+          {"type"=>"selector", "dimension"=>"a", "value"=>2},
+          {"type"=>"selector", "dimension"=>"a", "value"=>3}
+        ]},
+        {"type"=>"or", "fields"=>[
+          {"type"=>"selector", "dimension"=>"b", "value"=>1},
+          {"type"=>"selector", "dimension"=>"b", "value"=>2},
+          {"type"=>"selector", "dimension"=>"b", "value"=>3}
+        ]}
       ]}
-    ]}
+    end
   end
 
   describe '#having' do
