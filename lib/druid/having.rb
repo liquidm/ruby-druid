@@ -7,13 +7,19 @@ module Druid
     end
   end
 
-  class HavingClause
-    (instance_methods + private_instance_methods).each do |method|
-      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect|class)/ || method.to_s =~ /\?/
-        undef_method method
-      end
+  class HavingFilter
+    include Serializable
+
+    def clause?
+      is_a?(HavingClause)
     end
 
+    def operator?
+      is_a?(HavingOperator)
+    end
+  end
+
+  class HavingClause < HavingFilter
     def initialize(metric)
       @metric = metric
     end
@@ -30,23 +36,33 @@ module Druid
       self
     end
 
-    def to_s
-      to_hash.to_s
-    end
-
-    def as_json(*a)
-      to_hash
-    end
-
-    def to_json(*a)
-      to_hash.to_json(*a)
-    end
-
     def to_hash
       {
         :type => @type,
         :aggregation => @metric,
         :value => @value
+      }
+    end
+  end
+
+  class HavingOperator < HavingFilter
+    def initialize(type)
+      @type = type
+      @elements = []
+    end
+
+    def and?
+      @type == 'and'
+    end
+
+    def add(element)
+      @elements << element
+    end
+
+    def to_hash
+      {
+        :type => @type,
+        :havingSpecs => @elements
       }
     end
   end

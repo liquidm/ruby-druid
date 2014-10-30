@@ -5,6 +5,14 @@ module Druid
         PostAggregationField.new(name)
       end
     end
+
+    def js(*args)
+      if args.empty?
+        PostAggregationField.new(:js)
+      else
+        PostAggregationJavascript.new(args.first)
+      end
+    end
   end
 
   module PostAggregationOperators
@@ -90,6 +98,8 @@ module Druid
   end
 
   class PostAggregationConstant
+    include PostAggregationOperators
+
     attr_reader :value
 
     def initialize(value)
@@ -106,6 +116,42 @@ module Druid
 
     def as_json(*a)
       to_hash
+    end
+  end
+
+  class PostAggregationJavascript
+    include PostAggregationOperators
+    include Serializable
+
+    def initialize(function)
+      @field_names = extract_fields(function)
+      @function = function
+    end
+
+    def get_field_names
+      @field_names
+    end
+
+    def as(field)
+      @name = field.name.to_s
+      self
+    end
+
+    def to_hash
+      {
+        "type" => "javascript",
+        "name" => @name,
+        "fieldNames" => @field_names,
+        "function" => @function
+      }
+    end
+
+    private
+
+    def extract_fields(function)
+      match = function.match(/function\((.+)\)/)
+      raise 'Invalid Javascript function' unless match && match.captures
+      match.captures.first.split(',').map {|field| field.strip }
     end
   end
 end

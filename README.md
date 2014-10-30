@@ -91,11 +91,17 @@ A simple syntax for post aggregations with +,-,/,* can be used like:
 
 ```ruby
 query = Druid::Query.new('service/source').long_sum([:aggregate1, :aggregate2])
-query.postagg{(aggregate2 + aggregate2).as output_field_name}
+query.postagg { (aggregate2 + aggregate2).as output_field_name }
 ```
 
 Required fields for the postaggregation are fetched automatically by the
 library.
+
+Javascript post aggregations are also supported:
+
+```ruby
+query.postagg { js('function(aggregate1, aggregate2) { return aggregate1 + aggregate2 }').as result }
+```
 
 ### Query Interval
 

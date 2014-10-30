@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = "ruby-druid"
-  spec.version       = "0.1.8"
+  spec.version       = "0.1.9"
   spec.authors       = ["LiquidM, Inc."]
   spec.email         = ["opensource@liquidm.com"]
   spec.summary       = %q{Ruby client for metamx druid}
