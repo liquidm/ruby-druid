@@ -100,7 +100,7 @@ library.
 Javascript post aggregations are also supported:
 
 ```ruby
-query.postagg { js('function(aggregate1, aggregate2) { return aggregate1 + aggregate2 }').as result }
+query.postagg { js('function(aggregate1, aggregate2) { return aggregate1 + aggregate2; }').as result }
 ```
 
 ### Query Interval
