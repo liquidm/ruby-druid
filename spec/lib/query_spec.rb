@@ -388,21 +388,75 @@ end
   end
 
   describe '#having' do
-    it 'creates a greater than having clause' do
-      @query.having{a > 100}
-      JSON.parse(@query.to_json)['having'].should == {
-        "type"=>"greaterThan", "aggregation"=>"a", "value"=>100
+    subject(:having) { JSON.parse(@query.to_json)['having'] }
+
+    it 'creates an equalTo clause using ==' do
+      @query.having { a == 100 }
+      having.should == { 'type' => 'equalTo', 'aggregation' => 'a', 'value' => 100 }
+    end
+
+    it 'creates a not equalTo clause using !=' do
+      @query.having { a != 100 }
+      having.should == {
+        'type' => 'not',
+        'havingSpec' => { 'type' => 'equalTo', 'aggregation' => 'a', 'value' => 100 },
       }
     end
 
-    it 'chains having clauses with and' do
-      @query.having{a > 100}.having{b > 200}.having{c > 300}
-      JSON.parse(@query.to_json)['having'].should == {
-        "type" => "and",
-        "havingSpecs" => [
-          { "type" => "greaterThan", "aggregation" => "a", "value" => 100 },
-          { "type" => "greaterThan", "aggregation" => "b", "value" => 200 },
-          { "type" => "greaterThan", "aggregation" => "c", "value" => 300 }
+    it 'creates a greaterThan clause using >' do
+      @query.having { a > 100 }
+      having.should == { 'type' => 'greaterThan', 'aggregation' => 'a', 'value' => 100 }
+    end
+
+    it 'creates a lessThan clause using <' do
+      @query.having { a < 100 }
+      having.should == { 'type' => 'lessThan', 'aggregation' => 'a', 'value' => 100 }
+    end
+
+    it 'creates an add clause using &' do
+      @query.having { (a > 100) & (b > 200) }
+      having.should == {
+        'type' => 'and',
+        'havingSpecs' => [
+          { 'type' => 'greaterThan', 'aggregation' => 'a', 'value' => 100 },
+          { 'type' => 'greaterThan', 'aggregation' => 'b', 'value' => 200 },
+        ]
+      }
+    end
+
+    it 'creates an or clause using |' do
+      @query.having { (a > 100) | (b > 200) }
+      having.should == {
+        'type' => 'or',
+        'havingSpecs' => [
+          { 'type' => 'greaterThan', 'aggregation' => 'a', 'value' => 100 },
+          { 'type' => 'greaterThan', 'aggregation' => 'b', 'value' => 200 },
+        ]
+      }
+    end
+
+    it 'creates a not clause using !' do
+      @query.having { !((a == 100) & (b == 200)) }
+      having.should == {
+        'type' => 'not',
+        'havingSpec' => {
+          'type' => 'and',
+          'havingSpecs' => [
+            { 'type' => 'equalTo', 'aggregation' => 'a', 'value' => 100 },
+            { 'type' => 'equalTo', 'aggregation' => 'b', 'value' => 200 },
+          ]
+        }
+      }
+    end
+
+    it 'combines successive calls with and operator' do
+      @query.having { a > 100 }.having { b > 200 }.having { c > 300 }
+      having.should == {
+        'type' => 'and',
+        'havingSpecs' => [
+          { 'type' => 'greaterThan', 'aggregation' => 'a', 'value' => 100 },
+          { 'type' => 'greaterThan', 'aggregation' => 'b', 'value' => 200 },
+          { 'type' => 'greaterThan', 'aggregation' => 'c', 'value' => 300 },
         ]
       }
     end
