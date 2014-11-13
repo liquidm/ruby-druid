@@ -111,11 +111,12 @@ module Druid
       postagg(:double, &block)
     end
 
-    def filter(hash = nil, &block)
+    def filter(hash = nil, type = :in, &block)
       if hash
+        raise "#{type} is not a valid filter type!" unless [:in, :nin].include?(type)
         last = nil
         hash.each do |k,values|
-          filter = FilterDimension.new(k).in(values)
+          filter = FilterDimension.new(k).__send__(type, values)
           last = last ? last.&(filter) : filter
         end
         @properties[:filter] = @properties[:filter] ? @properties[:filter].&(last) : last
