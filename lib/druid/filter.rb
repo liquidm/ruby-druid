@@ -6,29 +6,37 @@ module Druid
       end
     end
 
+    def self.from_hash(hash, type = :in)
+      unless [:in, :nin].include?(type)
+        raise ArgumentError.new("#{type} is not a valid filter type")
+      end
+
+      last_filter = nil
+      hash.each do |dimension, values|
+        filter = FilterDimension.new(dimension).send(type, values)
+        last_filter = last_filter ? last_filter.&(filter) : filter
+      end
+
+      last_filter
+    end
+
+    def self.from_block(&block)
+      filter = self.new.instance_exec(&block)
+
+      unless filter.is_a?(FilterParameter)
+        raise ArgumentError.new("Not a valid filter block")
+      end
+
+      filter
+    end
+
     def method_missing(method_id, *args)
       FilterDimension.new(method_id)
     end
   end
 
   class FilterParameter
-    (instance_methods + private_instance_methods).each do |method|
-      unless method.to_s =~ /^(__|instance_eval|instance_exec|initialize|object_id|raise|puts|inspect|class|send)/ || method.to_s =~ /\?/
-        undef_method method
-      end
-    end
-
-    def to_s
-      to_hash.to_s
-    end
-
-    def as_json(*a)
-      to_hash
-    end
-
-    def to_json(*a)
-      to_hash.to_json(*a)
-    end
+    include Serializable
   end
 
   class FilterDimension < FilterParameter
@@ -40,11 +48,11 @@ module Druid
 
     def in_rec(bounds)
       RecFilter.new(@name, bounds)
-    end 
+    end
 
     def in_circ(bounds)
       CircFilter.new(@name, bounds)
-    end 
+    end
 
     def eq(value)
       return self.in(value) if value.is_a? Array
@@ -207,13 +215,13 @@ module Druid
       result
     end
   end
-  
+
   class RecFilter < FilterDimension
 
     def initialize(dimension, bounds)
       @dimension = dimension
       @bounds = bounds
-    end 
+    end
 
     def to_hash
       {
@@ -233,7 +241,7 @@ module Druid
     def initialize(dimension, bounds)
       @dimension = dimension
       @bounds = bounds
-    end 
+    end
 
     def to_hash
       {
