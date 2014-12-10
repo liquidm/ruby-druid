@@ -168,20 +168,8 @@ module Druid
 
     def having(&block)
       having = Having.new.instance_exec(&block)
-
-      if old_having = @properties[:having]
-        if old_having.operator? && old_having.and?
-          new_having = old_having
-        else
-          new_having = HavingOperator.new('and')
-          new_having.add(old_having)
-        end
-        new_having.add(having)
-      else
-        new_having = having
-      end
-
-      @properties[:having] = new_having
+      raise "Not a valid having" unless having.is_a? HavingFilter
+      @properties[:having] = @properties[:having] ? @properties[:having].&(having) : having
       self
     end
 

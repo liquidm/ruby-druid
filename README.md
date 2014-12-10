@@ -161,14 +161,41 @@ query = Druid::Query.new('service/source').long_sum(:aggregate1)
 query.granularity('P1D', 'Europe/Berlin')
 ```
 
-### Having
+### Having filters
 
 ```ruby
-Druid::Query.new('service/source').having{metric > 10}
+# equality
+Druid::Query.new('service/source').having { metric == 10 }
 ```
 
 ```ruby
-Druid::Query.new('service/source').having{metric < 10}
+# inequality
+Druid::Query.new('service/source').having { metric != 10 }
+```
+
+```ruby
+# greater, less
+Druid::Query.new('service/source').having { metric > 10 }
+Druid::Query.new('service/source').having { metric < 10 }
+```
+
+#### Compound having filters
+
+Having filters can be combined with boolean logic.
+
+```ruby
+# and
+Druid::Query.new('service/source').having { (metric != 1) & (metric2 != 2) }
+```
+
+```ruby
+# or
+Druid::Query.new('service/source').having { (metric == 1) | (metric2 == 2) }
+```
+
+```ruby
+# not
+Druid::Query.new('service/source').having{ !metric.eq(1) }
 ```
 
 ### Filters
