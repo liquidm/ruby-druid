@@ -81,8 +81,31 @@ Druid::Query.new('service/source').time_series([:aggregate1, :aggregate2])
 
 ### Aggregations
 
+#### longSum, doubleSum, count, min, max, hyperUnique
+
 ```ruby
 Druid::Query.new('service/source').long_sum([:aggregate1, :aggregate2])
+```
+
+In the same way could be used the following methods for
+[aggregations](http://druid.io/docs/latest/Aggregations.html) adding: `double_sum, count, min, max, hyper_unique`
+
+#### cardinality
+
+```ruby
+Druid::Query.new('service/source').cardinality(:aggregate, [:dimension1, dimension2], <by_row: true | false>)
+```
+
+#### javascript
+
+For example calculation for `sum(log(x)/y) + 10`:
+
+```ruby
+Druid::Query.new('service/source').js_aggregation(:aggregate, [:x, :y],
+  aggregate: "function(current, a, b)      { return current + (Math.log(a) * b); }",
+  combine:   "function(partialA, partialB) { return partialA + partialB; }",
+  reset:     "function()                   { return 10; }"
+)
 ```
 
 ### Post Aggregations

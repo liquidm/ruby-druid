@@ -155,6 +155,96 @@ describe Druid::Query do
     ]
   end
 
+  describe '#min' do
+    it 'builds aggregations with "min" type' do
+      @query.min(:a, :b)
+      expect(JSON.parse(@query.to_json)['aggregations']).to eq [
+        { 'type' => 'min', 'name' => 'a', 'fieldName' => 'a'},
+        { 'type' => 'min', 'name' => 'b', 'fieldName' => 'b'}
+      ]
+    end
+  end
+
+  describe '#max' do
+    it 'builds aggregations with "max" type' do
+      @query.max(:a, :b)
+      expect(JSON.parse(@query.to_json)['aggregations']).to eq [
+        { 'type' => 'max', 'name' => 'a', 'fieldName' => 'a'},
+        { 'type' => 'max', 'name' => 'b', 'fieldName' => 'b'}
+      ]
+    end
+  end
+
+  describe '#hyper_unique' do
+    it 'builds aggregation with "hyperUnique"' do
+      @query.hyper_unique(:a, :b)
+      expect(JSON.parse(@query.to_json)['aggregations']).to eq [
+        { 'type' => 'hyperUnique', 'name' => 'a', 'fieldName' => 'a'},
+        { 'type' => 'hyperUnique', 'name' => 'b', 'fieldName' => 'b'}
+      ]
+    end
+  end
+
+  describe '#cardinality' do
+    it 'builds aggregation with "cardinality" type' do
+      @query.cardinality(:a, [:dim1, :dim2], true)
+      expect(JSON.parse(@query.to_json)['aggregations']).to eq [
+        { 'type' => 'cardinality', 'name' => 'a', 'fieldNames' => ['dim1', 'dim2'], 'byRow' => true }
+      ]
+    end
+  end
+
+  describe '#js_aggregation' do
+    it 'builds aggregation with "javascript" type' do
+      @query.js_aggregation(:aggregate, [:x, :y],
+        aggregate: "function(current, a, b)      { return current + (Math.log(a) * b); }",
+        combine:   "function(partialA, partialB) { return partialA + partialB; }",
+        reset:     "function()                   { return 10; }"
+      )
+      expect(JSON.parse(@query.to_json)['aggregations']).to eq [{
+        'type' => 'javascript',
+        'name' => 'aggregate',
+        'fieldNames' => ['x', 'y'],
+        'fnAggregate' => 'function(current, a, b)      { return current + (Math.log(a) * b); }',
+        'fnCombine' =>   'function(partialA, partialB) { return partialA + partialB; }',
+        'fnReset' =>     'function()                   { return 10; }'
+      }]
+    end
+  end
+
+  describe '#aggregate' do
+    it 'builds aggregation with "max" type' do
+      @query.aggregate(:max, :a)
+      expect(JSON.parse(@query.to_json)['aggregations']).to eq [
+        { 'type' => 'max', 'name' => 'a', 'fieldName' => 'a'}
+      ]
+    end
+  end
+
+  describe '#build_aggregation' do
+    it 'builds aggregation with custom options' do
+      expect(@query.build_aggregation(:max, :a, custom_option: 'b')).to eq(
+        type: 'max', name: 'a', fieldName: 'a', customOption: 'b'
+      )
+    end
+
+    context 'when field_names option passed' do
+      it 'builds aggregation without default field_name value' do
+        expect(@query.build_aggregation(:max, :a, field_names: ['b', 'c'])).to eq(
+          type: 'max', name: 'a', fieldNames: ['b', 'c']
+        )
+      end
+    end
+
+    context 'when aggregation type is filtered' do
+      it 'builds aggregation without default field_name value' do
+        expect(@query.build_aggregation(:filtered, :a)).to eq(
+          type: 'filtered', name: 'a'
+        )
+      end
+    end
+  end
+
   it 'appends long_sum properties from aggregations on calling long_sum again' do
     @query.long_sum(:a, :b, :c)
     @query.double_sum(:x,:y)
