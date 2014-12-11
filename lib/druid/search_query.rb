@@ -27,7 +27,7 @@ module Druid
     end
 
     def sort(type)
-      @sort = type.to_s
+      @sort = { type: type.to_s }
       self
     end
 

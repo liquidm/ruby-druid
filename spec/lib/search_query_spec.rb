@@ -34,7 +34,7 @@ describe Druid::SearchQuery do
 
     before { query.sort(type) }
 
-    its([:sort]) { should == type }
+    its([:sort]) { should == { type: type } }
   end
 
 end
