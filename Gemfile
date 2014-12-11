@@ -7,6 +7,8 @@ gem 'ripl'
 gem 'terminal-table'
 
 group :test, :development do
+  gem 'byebug'
   gem 'liquid-development'
+  gem 'timecop'
   gem 'webmock'
 end

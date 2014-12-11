@@ -11,23 +11,38 @@ Ripl::Shell.class_eval do
   def format_query_result(result, query)
     include_timestamp = query.properties[:granularity] != 'all'
 
-    keys = result.empty? ? [] : result.last.keys
-    grouped_result = result.group_by(&:timestamp)
-
-    Terminal::Table.new(:headings => keys) do
-      grouped_result.each do |timestamp, rows|
-        if include_timestamp
-          add_row :separator unless timestamp == result.first.timestamp
-          add_row [{ :value => timestamp, :colspan => keys.length }]
-          add_row :separator
+    if query.is_a?(Druid::SearchQuery)
+      keys = ['dimension', 'value']
+      Terminal::Table.new(:headings => keys) do
+        result.each do |response_row|
+          if include_timestamp
+            timestamp = response_row.timestamp
+            add_row :separator unless timestamp == result.first.timestamp
+            add_row [{ :value => timestamp, :colspan => keys.length }]
+            add_row :separator
+          end
+          response_row.each {|values| add_row [values['dimension'], values['value']] }
         end
-        rows.each {|row| add_row keys.map {|key| row[key] } }
+      end
+    else
+      keys = result.empty? ? [] : result.last.keys
+      grouped_result = result.group_by(&:timestamp)
+
+      Terminal::Table.new(:headings => keys) do
+        grouped_result.each do |timestamp, rows|
+          if include_timestamp
+            add_row :separator unless timestamp == result.first.timestamp
+            add_row [{ :value => timestamp, :colspan => keys.length }]
+            add_row :separator
+          end
+          rows.each {|row| add_row keys.map {|key| row[key] } }
+        end
       end
     end
   end
 
   def format_result(result)
-    if result.is_a?(Druid::Query)
+    if result.is_a?(Druid::Query) || result.is_a?(Druid::SearchQuery)
       start = Time.now.to_f
       puts format_query_result(result.send, result)
       puts "Response Time: #{(Time.now.to_f - start).round(3)}s"
@@ -87,6 +102,7 @@ module Druid
       :hyper_unique,
       :cardinality,
       :js_aggregation,
+      :search,
     ]
 
   end

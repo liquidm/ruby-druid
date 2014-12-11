@@ -34,7 +34,7 @@ module Druid
       @properties[:queryType] = type
       self
     end
-    
+
     def get_query_type()
       @properties[:queryType] || :groupBy
     end
@@ -50,6 +50,10 @@ module Druid
       "#{@service}/#{@properties[:dataSource]}"
     end
 
+    def search(*dimensions)
+      SearchQuery.new(source, @client).dimensions(dimensions)
+    end
+
     def group_by(*dimensions)
       query_type(:groupBy)
       @properties[:dimensions] = dimensions.flatten
@@ -63,7 +67,7 @@ module Druid
       @properties[:threshold] = threshold
       self
     end
-    
+
     def time_series(*aggregations)
       query_type(:timeseries)
       #@properties[:aggregations] = aggregations.flatten
@@ -141,19 +145,14 @@ module Druid
 
     def filter(hash = nil, type = :in, &block)
       if hash
-        raise "#{type} is not a valid filter type!" unless [:in, :nin].include?(type)
-        last = nil
-        hash.each do |k,values|
-          filter = FilterDimension.new(k).__send__(type, values)
-          last = last ? last.&(filter) : filter
-        end
-        @properties[:filter] = @properties[:filter] ? @properties[:filter].&(last) : last
+        filter = Filter.from_hash(hash, type)
+      elsif block
+        filter = Filter.from_block(&block)
       end
-      if block
-        filter = Filter.new.instance_exec(&block)
-        raise "Not a valid filter" unless filter.is_a? FilterParameter
-        @properties[:filter] = @properties[:filter] ? @properties[:filter].&(filter) : filter
-      end
+
+      return self unless filter
+
+      @properties[:filter] = @properties[:filter] ? @properties[:filter].&(filter) : filter
       self
     end
 

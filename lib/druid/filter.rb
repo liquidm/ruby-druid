@@ -24,7 +24,7 @@ module Druid
       filter = self.new.instance_exec(&block)
 
       unless filter.is_a?(FilterParameter)
-        raise ArgumentError.new("Not a valid filter block")
+        raise ArgumentError.new("Not a valid filter")
       end
 
       filter
