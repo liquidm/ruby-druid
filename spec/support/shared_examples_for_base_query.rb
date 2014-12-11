@@ -43,13 +43,20 @@ shared_examples :base_query do
   end
 
   describe '#granularity' do
+    let(:time_zone) { nil }
+
     before { query.granularity(granularity, time_zone) }
 
-    context 'with a simple granularity' do
-      let(:granularity) { :day }
-      let(:time_zone) { nil }
+    context 'with all granularity' do
+      let(:granularity) { :all }
 
       its([:granularity]) { should == granularity.to_s }
+    end
+
+    context 'with hour granularity' do
+      let(:granularity) { :hour }
+
+      its([:granularity]) { should == { type: :period, period: 'PT1H' } }
     end
 
     context 'with a period and time zone' do
@@ -61,7 +68,6 @@ shared_examples :base_query do
 
     context 'with a duration' do
       let(:granularity) { 5 }
-      let(:time_zone) { nil }
 
       before { query.granularity(granularity) }
 

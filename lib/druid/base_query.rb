@@ -4,6 +4,14 @@ module Druid
   class BaseQuery
     include Serializable
 
+    DURATION_MAPPING = {
+      'minute' => 'PT1M',
+      'fifteen_minute' => 'PT15M',
+      'thirty_minute' => 'PT30M',
+      'hour' => 'PT1H',
+      'day' => 'P1D',
+    }.freeze
+
     attr_reader :source
 
     def initialize(source, client = nil)
@@ -45,14 +53,13 @@ module Druid
         }
       else
         granularity_s = granularity.to_s
-        if %w{all none minute fifteen_minute thirty_minute hour day}.include?(granularity_s)
-          # TODO: convert %w{minute fifteen_minute thirty_minute hour day} to ISO8601 duration
+        if %w{all none}.include?(granularity_s)
           @granularity = granularity_s
           return self
         else
           @granularity = {
             type: :period,
-            period: granularity_s,
+            period: DURATION_MAPPING[granularity_s] || granularity_s,
           }
           @granularity[:timeZone] = time_zone if time_zone
         end
