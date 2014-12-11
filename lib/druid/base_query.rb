@@ -46,6 +46,7 @@ module Druid
       else
         granularity_s = granularity.to_s
         if %w{all none minute fifteen_minute thirty_minute hour day}.include?(granularity_s)
+          # TODO: convert %w{minute fifteen_minute thirty_minute hour day} to ISO8601 duration
           @granularity = granularity_s
           return self
         else
@@ -62,15 +63,15 @@ module Druid
     end
 
     def interval(from, to = Time.now)
-      now = Time.now
-      from = now + from if from.is_a?(Fixnum)
-      to = now + to if to.is_a?(Fixnum)
-
-      @intervals = ["#{from.iso8601}/#{to.iso8601}"]
-      self
+      intervals([[from, to]])
     end
 
     alias_method :[], :interval
+
+    def intervals(intervals)
+      @intervals = intervals.map {|params| create_interval(*params) }
+      self
+    end
 
     def properties
       to_hash
@@ -89,6 +90,16 @@ module Druid
         intervals: @intervals,
         context: @hash,
       }
+    end
+
+    protected
+
+    def create_interval(from, to)
+      now = Time.now
+      from = now + from if from.is_a?(Fixnum)
+      to = now + to if to.is_a?(Fixnum)
+
+      "#{from.iso8601}/#{to.iso8601}"
     end
 
   end

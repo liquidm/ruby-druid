@@ -1,7 +1,11 @@
 shared_examples :base_query do
 
+  let(:now) { Time.now }
   let(:data_source) { 'some_datasource' }
   let(:query) { described_class.new(data_source) }
+
+  before { Timecop.freeze(now) }
+  after { Timecop.return }
 
   subject { query.to_hash }
 
@@ -17,19 +21,24 @@ shared_examples :base_query do
   end
 
   describe '#interval' do
-    let(:now) { Time.now }
+    let(:from) { -86400 }
 
-    before do
-      Timecop.freeze(now)
+    it 'calls #intervals' do
+      expect(query).to receive(:intervals).with([[from, Time.now]])
       query.interval(from)
     end
+  end
 
-    after { Timecop.return }
+  describe '#intervals' do
+    before { query.intervals(intervals) }
 
-    context 'with a numeric from' do
-      let(:from) { -86400 }
+    context 'with numeric values' do
+      let(:intervals) { [[-360, -240], [-120, 0]] }
 
-      its([:intervals]) { should == ["#{(now + from).iso8601}/#{now.iso8601}"] }
+      its([:intervals]) { should == [
+        "#{(now + intervals[0][0]).iso8601}/#{(now + intervals[0][1]).iso8601}",
+        "#{(now + intervals[1][0]).iso8601}/#{(now + intervals[1][1]).iso8601}",
+      ]}
     end
   end
 
