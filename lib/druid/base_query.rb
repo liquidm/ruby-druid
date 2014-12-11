@@ -65,7 +65,7 @@ module Druid
         end
       end
 
-      @granularity[:origin] = origin if origin
+      @granularity[:origin] = origin.iso8601 if origin
       self
     end
 
