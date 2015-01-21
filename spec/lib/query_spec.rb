@@ -37,6 +37,21 @@ describe Druid::Query do
     result['threshold'].should == 25
   end
 
+  describe '#time_boundary' do
+    it 'sets request type to timeBoundary' do
+      @query.time_boundary
+      result = JSON.parse(@query.to_json)
+      expect(JSON.parse(@query.to_json)['queryType']).to eq('timeBoundary')
+    end
+
+    it 'sets bound property' do
+      @query.time_boundary('maxTime')
+      result = JSON.parse(@query.to_json)
+      puts result
+      expect(JSON.parse(@query.to_json)['bound']).to eq('maxTime')
+    end
+  end
+
   describe '#postagg' do
     it 'build a post aggregation with a constant right' do
       @query.postagg{(a + 1).as ctr }

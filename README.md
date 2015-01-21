@@ -79,6 +79,15 @@ by the timeseries query.
 Druid::Query.new('service/source').time_series([:aggregate1, :aggregate2])
 ```
 
+### TimeBoundary
+
+A [TimeBoundaryQuery](http://druid.io/docs/latest/TimeBoundaryQuery.html)
+queries for time bounds of available data.
+
+```ruby
+Druid::Query.new('service/source').time_boundary
+```
+
 ### Aggregations
 
 #### longSum, doubleSum, count, min, max, hyperUnique
