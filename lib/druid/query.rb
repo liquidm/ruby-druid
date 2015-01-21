@@ -56,6 +56,12 @@ module Druid
       self
     end
 
+    def time_boundary(bound = nil)
+      query_type(:timeBoundary)
+      @properties[:bound] = bound if bound
+      self
+    end
+
     def topn(dimension, metric, threshold)
       query_type(:topN)
       @properties[:dimension] = dimension
