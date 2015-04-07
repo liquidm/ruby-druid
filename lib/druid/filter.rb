@@ -40,11 +40,11 @@ module Druid
 
     def in_rec(bounds)
       RecFilter.new(@name, bounds)
-    end 
+    end
 
     def in_circ(bounds)
       CircFilter.new(@name, bounds)
-    end 
+    end
 
     def eq(value)
       return self.in(value) if value.is_a? Array
@@ -207,13 +207,13 @@ module Druid
       result
     end
   end
-  
+
   class RecFilter < FilterDimension
 
     def initialize(dimension, bounds)
       @dimension = dimension
       @bounds = bounds
-    end 
+    end
 
     def to_hash
       {
@@ -233,7 +233,7 @@ module Druid
     def initialize(dimension, bounds)
       @dimension = dimension
       @bounds = bounds
-    end 
+    end
 
     def to_hash
       {
@@ -255,14 +255,14 @@ module Druid
     end
 
     def self.new_comparison(dimension, operator, value)
-      self.new(dimension, "#{dimension} #{operator} #{value.is_a?(String) ? "'#{value}'" : value}")
+      self.new(dimension, "return(#{dimension} #{operator} #{value.is_a?(String) ? "'#{value}'" : value});")
     end
 
     def to_hash
       {
         :type => 'javascript',
         :dimension => @dimension,
-        :function => "function(#{@dimension}) { return(#{@expression}); }"
+        :function => "function(#{@dimension}) { #{@expression} }"
       }
     end
   end
