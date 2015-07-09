@@ -51,6 +51,7 @@ module Druid
     end
 
     def group_by(*dimensions)
+      return time_series if dimensions.flatten.empty?
       query_type(:groupBy)
       @properties[:dimensions] = dimensions.flatten
       self
