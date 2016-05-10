@@ -12,7 +12,7 @@ module Druid
     attr_reader :properties
 
     def initialize(source, client = nil)
-      @properties = {}
+      @properties = {"context" => {"priority" => 1}}
       @client = client
 
       # set some defaults
