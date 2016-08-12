@@ -52,7 +52,7 @@ module Druid
         @watched_services[service] = @zk.register(watchPath, :only => :child) do |event|
           old_handler = @watched_services.delete(service)
           if old_handler
-            old_handler.unregister
+            old_handler.unregister rescue true
           end
           check_service service
         end
@@ -65,11 +65,11 @@ module Druid
 
         # verify the new entries to be living brokers
         (live - known).each do |name|
-          info = @zk.get "#{watchPath}/#{name}"
-          node = JSON.parse(info[0])
-          uri =  "http://#{node['address']}:#{node['port']}/druid/v2/"
-
           begin
+            info = @zk.get "#{watchPath}/#{name}"
+            node = JSON.parse(info[0])
+            uri =  "http://#{node['address']}:#{node['port']}/druid/v2/"
+
             check_uri = "#{uri}datasources/"
 
             check = RestClient::Request.execute({
