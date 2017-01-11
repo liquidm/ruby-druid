@@ -184,6 +184,14 @@ module Druid
         return self
       when 'day'
         gran = 'P1D'
+      when 'week'
+        gran = 'P1W'
+      when 'month'
+        gran = 'P1M'
+      when 'quarter'
+        gran = 'P3M'
+      when 'year'
+        gran = 'P1Y'
       end
 
       time_zone ||= Time.now.strftime('%Z')
